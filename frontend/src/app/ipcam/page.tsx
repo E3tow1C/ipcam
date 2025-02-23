@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/SideBar";
 
 export default function Home() {
+  const currentPath = usePathname();
+
   return (
     <div className="h-screen flex flex-col">
       <div className="flex flex-1">
@@ -13,7 +15,7 @@ export default function Home() {
         <div className="flex-1 px-12 py-9">
           <nav className="w-full flex items-center">
             <h1 className="text-2xl font-bold text-gray-700 flex items-center">
-              Dashboard
+              IP Camera
             </h1>
           </nav>
           <main>
