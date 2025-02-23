@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faCircleCheck, faImage, faUpload } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "@/components/SideBar";
 import { useState } from "react";
+import { uploadImage } from "@/services/apis";
 
 export default function Home() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -50,9 +51,11 @@ export default function Home() {
     setImagePreview(null);
   };
 
-  const handleUpload = () => {
-    // Logic for upload action
-    console.log("Uploading image...");
+  const handleUpload = async () => {
+    if (!imagePreview) return;
+    const imageBlob = await fetch(imagePreview).then(res => res.blob());
+    const imageFile = new File([imageBlob], "uploaded_image.png", { type: imageBlob.type });
+    await uploadImage(imageFile);
   };
 
   return (

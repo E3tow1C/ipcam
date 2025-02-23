@@ -5,5 +5,6 @@ export const API_ROUTES = {
     GET: `${BASE_API_URL}/ipcam`,
     POST: `${BASE_API_URL}/ipcam`,
   },
+  UPLOAD: `${BASE_API_URL}/upload`,
   HEALTH_CHECK: `${BASE_API_URL}/`,
 };
