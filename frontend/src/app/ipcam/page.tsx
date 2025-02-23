@@ -24,7 +24,7 @@ export default function Home() {
           </nav>
           <div className="absolute left-0 right-0 top-32">
             <div className="bg-gray-800 rounded-xl 
-              w-[90%] max-w-[800px] h-[500px] mx-auto
+              w-[90%] max-w-[800px] h-[450px] mx-auto
               shadow-xl
               flex items-center justify-center text-white text-center
             ">
