@@ -13,6 +13,8 @@ import cv2
 import io
 import uuid
 
+BUCKET_NAME = "images"
+
 app = FastAPI()
 
 app.add_middleware(
@@ -31,10 +33,10 @@ minio_client = Minio(
     region="us-east-1",
     secure=False,
 )
-bucket_name = "images"
 
-if not minio_client.bucket_exists(bucket_name):
-    minio_client.make_bucket(bucket_name)
+
+if not minio_client.bucket_exists(BUCKET_NAME):
+    minio_client.make_bucket(BUCKET_NAME)
 
 mongo_client = MongoClient("mongodb://root:password@mongodb:27017/")
 db = mongo_client["camera_db"]
@@ -61,7 +63,7 @@ def upload_image(file: UploadFile = File(...)):
         object_name = f"uploaded_{uuid.uuid4()}_{datetime.now().strftime("%Y%m%d%H%M%S")}{file_extension}"
 
         minio_client.put_object(
-            bucket_name,
+            BUCKET_NAME,
             object_name,
             io.BytesIO(data),
             length=len(data),
@@ -72,7 +74,7 @@ def upload_image(file: UploadFile = File(...)):
 
     try:
         image_url = minio_client.presigned_get_object(
-            bucket_name, object_name, expires=timedelta(days=7)
+            BUCKET_NAME, object_name, expires=timedelta(days=7)
         )
         image_url = image_url.replace(
             "http://minio:9000", "http://localhost:8000/storage"
@@ -115,7 +117,7 @@ def delete_image(image_id: str):
 
         object_name = record["object_name"]
         try:
-            minio_client.remove_object(bucket_name, object_name)
+            minio_client.remove_object(BUCKET_NAME, object_name)
             return {
                 "status": "completed",
                 "message": f"Image {object_name} successfully deleted",
@@ -147,7 +149,7 @@ def delete_all_images():
         records = images_collection.find({})
         for record in records:
             object_name = record["object_name"]
-            minio_client.remove_object(bucket_name, object_name)
+            minio_client.remove_object(BUCKET_NAME, object_name)
 
         images_collection.delete_many({})
         return {"status": "completed", "message": "All images successfully deleted"}
@@ -174,7 +176,7 @@ def get_images():
 @app.get("/storage/images/{object_name}")
 async def get_image(object_name: str):
     try:
-        data = minio_client.get_object(bucket_name, object_name)
+        data = minio_client.get_object(BUCKET_NAME, object_name)
 
         async def image_stream():
             try:
@@ -228,7 +230,7 @@ def capture_and_save_image():
     try:
         data = io.BytesIO(image_bytes)
         minio_client.put_object(
-            bucket_name,
+            BUCKET_NAME,
             object_name,
             data,
             length=len(image_bytes),
@@ -240,7 +242,7 @@ def capture_and_save_image():
 
     try:
         image_url = minio_client.presigned_get_object(
-            bucket_name, object_name, expires=timedelta(days=7)
+            BUCKET_NAME, object_name, expires=timedelta(days=7)
         )
         image_url = image_url.replace(
             "http://minio:9000", "http://localhost:8000/storage"
