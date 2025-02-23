@@ -230,26 +230,5 @@ def capture_and_save_image():
     return image_url
 
 
-# @app.get("/images/{date}")
-# def get_images_by_date(date: str):
-#     """
-#     ดึงลิงก์ของรูปภาพที่ถูกจับในวันที่ระบุ
-#     คาดว่าพารามิเตอร์ date มีรูปแบบ 'YYYY-MM-DD'
-#     """
-#     try:
-#         date_obj = datetime.strptime(date, "%Y-%m-%d")
-#     except ValueError:
-#         raise HTTPException(status_code=400, detail="รูปแบบวันที่ไม่ถูกต้อง ควรเป็น YYYY-MM-DD")
-
-#     start = date_obj
-#     end = date_obj + timedelta(days=1)
-
-#     # ค้นหาเอกสารที่มี timestamp ในช่วงเวลาที่ระบุ
-#     records = images_collection.find({"timestamp": {"$gte": start, "$lt": end}})
-#     image_urls = [record["image_url"] for record in records]
-
-#     return {"image_urls": image_urls}
-
-
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
