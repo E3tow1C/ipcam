@@ -3,10 +3,10 @@ from fastapi import FastAPI, HTTPException, UploadFile, File
 from datetime import datetime, timedelta
 from minio import Minio
 from pymongo import MongoClient
-from typing import Union
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pathlib import Path
 
 import uvicorn
 import cv2
@@ -52,24 +52,20 @@ def read_root():
     return {"Hello": "World init project"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
 @app.post("/upload")
 def upload_image(file: UploadFile = File(...)):
     try:
         data = file.file.read()
-        object_name = (
-            file.filename + "_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".jpg"
-        )
+        file_extension = Path(file.filename).suffix
+        original_filename = Path(file.filename).stem
+        object_name = f"uploaded_{original_filename}_{datetime.now().strftime("%Y%m%d%H%M%S")}{file_extension}"
+
         minio_client.put_object(
             bucket_name,
             object_name,
             io.BytesIO(data),
             length=len(data),
-            content_type="image/jpeg",
+            content_type=file.content_type,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload to MinIO failed: {str(e)}")
@@ -134,6 +130,31 @@ def delete_image(image_id: str):
         raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Delete image failed: {str(e)}")
+
+
+@app.delete(
+    "/delete_all",
+    summary="Delete all images",
+    description="Delete all images from both MinIO storage and MongoDB",
+    responses={
+        200: {"description": "All images successfully deleted"},
+        500: {"description": "Internal server error"},
+    },
+)
+def delete_all_images():
+    try:
+        records = images_collection.find({})
+        for record in records:
+            object_name = record["object_name"]
+            minio_client.remove_object(bucket_name, object_name)
+
+        images_collection.delete_many({})
+        return {"status": "completed", "message": "All images successfully deleted"}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Delete all images failed: {str(e)}"
+        )
 
 
 @app.get("/capture")
@@ -201,7 +222,7 @@ def capture_and_save_image():
 
     image_bytes = buffer.tobytes()
     timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
-    object_name = f"{timestamp_str}.jpg"
+    object_name = f"captured_{timestamp_str}.jpg"
 
     try:
         data = io.BytesIO(image_bytes)
