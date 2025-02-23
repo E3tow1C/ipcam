@@ -11,6 +11,7 @@ from pathlib import Path
 import uvicorn
 import cv2
 import io
+import uuid
 
 app = FastAPI()
 
@@ -57,8 +58,7 @@ def upload_image(file: UploadFile = File(...)):
     try:
         data = file.file.read()
         file_extension = Path(file.filename).suffix
-        original_filename = Path(file.filename).stem
-        object_name = f"uploaded_{original_filename}_{datetime.now().strftime("%Y%m%d%H%M%S")}{file_extension}"
+        object_name = f"uploaded_{uuid.uuid4()}_{datetime.now().strftime("%Y%m%d%H%M%S")}{file_extension}"
 
         minio_client.put_object(
             bucket_name,
@@ -83,6 +83,7 @@ def upload_image(file: UploadFile = File(...)):
     record = {
         "timestamp": datetime.now(),
         "object_name": object_name,
+        "original_filename": file.filename,
         "image_url": image_url,
     }
     images_collection.insert_one(record)
