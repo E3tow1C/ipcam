@@ -19,7 +19,7 @@ export default async function Home() {
           <main className="mt-8">
             {images.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {images.map((img, index) => (
+                {images.reverse().map((img, index) => (
                   <div key={index} className="overflow-hidden rounded shadow">
                     <img
                       src={img}
