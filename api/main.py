@@ -225,7 +225,7 @@ def capture_and_save_image():
 
     image_bytes = buffer.tobytes()
     timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
-    object_name = f"captured_{timestamp_str}.jpg"
+    object_name = f"captured_{uuid.uuid4()}_{timestamp_str}.jpg"
 
     try:
         data = io.BytesIO(image_bytes)
