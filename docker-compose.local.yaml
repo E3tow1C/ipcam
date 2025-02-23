@@ -7,7 +7,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
-      - mongodb-data:/data/db
+      - mongodb_data:/data/db
     ports:
       - "27017:27017"
 
@@ -20,7 +20,7 @@ services:
       - MINIO_ROOT_PASSWORD=password
     command: server /data --console-address ":9001"
     volumes:
-      - minio-data:/data
+      - minio_data:/data
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -41,7 +41,5 @@ services:
       - ./api:/app
 
 volumes:
-  mongodb-data: {
-    name: mongodb-data
-  }
-  minio-data:
+  mongodb_data:
+  minio_data:

@@ -5,3 +5,4 @@ io
 datetime
 minio
 pymongo
+opencv-python
