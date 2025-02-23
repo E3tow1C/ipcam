@@ -84,6 +84,7 @@ def upload_image(file: UploadFile = File(...)):
 
     record = {
         "timestamp": datetime.now(),
+        "type": "upload",
         "object_name": object_name,
         "original_filename": file.filename,
         "image_url": image_url,
@@ -254,7 +255,9 @@ def capture_and_save_image():
 
     record = {
         "timestamp": datetime.now(),
+        "type": "capture",
         "object_name": object_name,
+        "original_filename": object_name,
         "image_url": image_url,
     }
     images_collection.insert_one(record)
