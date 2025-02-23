@@ -5,12 +5,22 @@ from pymongo import MongoClient
 from typing import Union
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 import uvicorn
 import cv2
 import io
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # ในการใช้งานจริงควรระบุ domain ที่อนุญาตแทน "*"
+    allow_credentials=True,
+    allow_methods=["*"],  # หรือระบุเฉพาะ method ที่ต้องการ เช่น ["GET", "POST"]
+    allow_headers=["*"],
+)
+
 
 minio_client = Minio(
     "minio:9000",
