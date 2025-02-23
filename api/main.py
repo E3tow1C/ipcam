@@ -155,8 +155,16 @@ async def get_image(object_name: str):
         data = minio_client.get_object(bucket_name, object_name)
 
         async def image_stream():
-            image_data = data.read()
-            yield image_data
+            try:
+                while True:
+                    chunk = data.read(8 * 1024)
+                    if not chunk:
+                        break
+                    yield chunk
+
+            finally:
+                data.close()
+                data.release_conn()
 
         return StreamingResponse(
             image_stream(),
