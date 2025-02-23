@@ -1,8 +1,15 @@
 import { API_ROUTES } from '../constants/api-routes';
 
-const fetchAPI = async (url: string, method: string, body: any = null, token: string | null = null) => {
+type RequestBody = Record<string, unknown> | FormData | null;
+
+const fetchAPI = async (
+  url: string,
+  method: string,
+  body: RequestBody = null,
+  token: string | null = null
+) => {
   try {
-    const headers: any = {};
+    const headers: Record<string, string> = {};
 
     if (body && !(body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
@@ -32,16 +39,7 @@ const fetchAPI = async (url: string, method: string, body: any = null, token: st
     }
     throw new Error('An unexpected error occurred');
   }
-};
-
-export const getBlogs = async () => {
-  try {
-    const response = await fetchAPI(API_ROUTES.IPCAM.GET, 'GET', null);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+}
 
 export const uploadImage = async (image: File) => {
   try {
