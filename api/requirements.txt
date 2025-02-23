@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-cv2
 io
 datetime
 minio
