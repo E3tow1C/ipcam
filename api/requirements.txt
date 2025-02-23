@@ -4,3 +4,4 @@ datetime
 minio
 pymongo
 opencv-python
+python-multipart
