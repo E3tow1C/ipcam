@@ -1,23 +1,27 @@
 'use client'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCameraAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCameraAlt, faCircleDot, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "@/components/SideBar";
 import { captureImage } from "@/services/apis";
 import { useState } from "react";
 
 export default function Home() {
   const [captureImageList, setCaptureImageList] = useState<string[]>([]);
+  const [isCapturing, setIsCapturing] = useState<boolean>(false);
 
   const handleCapture = async () => {
+    if (isCapturing) return;
+    setIsCapturing(true);
     const response = await captureImage();
     setCaptureImageList([...captureImageList, response]);
+    setIsCapturing(false);
   }
 
   return (
     <div className="h-screen flex flex-col">
       <div className="flex flex-1">
         <Sidebar />
-        <div className="flex-1 relative">
+        <div className="flex-1 relative h-screen overflow-scroll">
           <nav className="w-full bg-gradient-to-br h-52 from-blue-500 to-blue-400">
             <h1 className="text-2xl px-12 ml-8 md:ml-0 py-7 md:py-9 font-bold text-white flex items-center">
               IP Camera
@@ -38,23 +42,24 @@ export default function Home() {
             <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
               <div className="flex items-center justify-between p-3">
                 <h2 className="text-lg font-bold">IP Camera</h2>
-                <button className="bg-blue-500 text-white px-3 py-2 rounded-md" onClick={handleCapture}>
-                  <FontAwesomeIcon icon={faCameraAlt} className="mr-2" />
+                <button className="bg-blue-500 text-white px-3 py-2 rounded-md disabled:opacity-70" onClick={handleCapture} disabled={isCapturing}>
+                  {
+                    isCapturing ? (
+                      <FontAwesomeIcon icon={faCircleNotch} className="animate-spin mr-2" />
+                    ) : <FontAwesomeIcon icon={faCameraAlt} className="mr-2" />
+                  }
                   Take Picture
                 </button>
               </div>
             </div>
-            <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
-              <div className="flex items-center justify-between p-3">
-                <h2 className="text-lg font-bold">Captured Images</h2>
-              </div>
-              <div className="grid grid-cols-3 gap-3 p-3">
+            <div className="w-[90%] max-w-[800px] mx-auto my-5 bg-white z-10">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {captureImageList.map((image, index) => (
                   <div key={index} className="relative">
                     <img
                       src={image}
                       alt="captured-image"
-                      className="w-full h-full object-cover rounded-xl"
+                      className="object-cover border rounded-xl animate-slide-up"
                     />
                   </div>
                 ))}
