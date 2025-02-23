@@ -52,3 +52,12 @@ export const uploadImage = async (image: File) => {
     throw error;
   }
 };
+
+export const captureImage = async (): Promise<string> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.IPCAM, 'GET');
+    return response.image_url;
+  } catch (error) {
+    throw error;
+  }
+};

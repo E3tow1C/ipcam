@@ -1,15 +1,16 @@
 'use client'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCameraAlt, faChartPie, faLock } from "@fortawesome/free-solid-svg-icons";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { faCameraAlt } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "@/components/SideBar";
+import { captureImage } from "@/services/apis";
+import { useState } from "react";
 
 export default function Home() {
+  const [captureImageList, setCaptureImageList] = useState<string[]>([]);
 
-  const handleUpload = () => {
-    // Logic for upload action
-    console.log("Uploading image...");
+  const handleCapture = async () => {
+    const response = await captureImage();
+    setCaptureImageList([...captureImageList, response]);
   }
 
   return (
@@ -30,17 +31,33 @@ export default function Home() {
             ">
               <img
                 src="http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
-                alt="IP Camera Stream"
+                alt="ipcam"
                 className="w-full h-full object-cover rounded-xl"
               />
             </div>
             <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
               <div className="flex items-center justify-between p-3">
                 <h2 className="text-lg font-bold">IP Camera</h2>
-                <button className="bg-blue-500 text-white px-3 py-2 rounded-md" onClick={handleUpload}>
+                <button className="bg-blue-500 text-white px-3 py-2 rounded-md" onClick={handleCapture}>
                   <FontAwesomeIcon icon={faCameraAlt} className="mr-2" />
                   Take Picture
                 </button>
+              </div>
+            </div>
+            <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
+              <div className="flex items-center justify-between p-3">
+                <h2 className="text-lg font-bold">Captured Images</h2>
+              </div>
+              <div className="grid grid-cols-3 gap-3 p-3">
+                {captureImageList.map((image, index) => (
+                  <div key={index} className="relative">
+                    <img
+                      src={image}
+                      alt="captured-image"
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
