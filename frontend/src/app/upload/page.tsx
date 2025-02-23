@@ -106,7 +106,7 @@ export default function Home() {
                 <h2 className="text-xl mb-16 text-gray-300">
                   Drag and drop your image here
                   <span className="block text-lg text-gray-400 mt-2">
-                    you can also click to upload
+                    you can also browse your file
                   </span>
                 </h2>
                 <label
@@ -114,7 +114,7 @@ export default function Home() {
                   className="px-6 py-3 bg-white text-gray-700 rounded-md cursor-pointer hover:bg-gray-200 transition-all"
                 >
                   <FontAwesomeIcon icon={faUpload} className="mr-2" />
-                  Choose from file
+                  Browse file
                 </label>
                 <input
                   id="fileInput"
