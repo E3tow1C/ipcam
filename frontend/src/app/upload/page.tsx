@@ -9,6 +9,7 @@ import { Toaster, toast } from "react-hot-toast";
 export default function Home() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -17,6 +18,8 @@ export default function Home() {
     if (files && files.length > 0) {
       const file = files[0];
       const reader = new FileReader();
+      
+      setFileName(file.name);
 
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -30,6 +33,8 @@ export default function Home() {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
+
+      setFileName(file.name);
 
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -50,12 +55,13 @@ export default function Home() {
 
   const handleCancel = () => {
     setImagePreview(null);
+    setFileName(null);
   };
 
   const handleUpload = async () => {
     if (!imagePreview) return;
     const imageBlob = await fetch(imagePreview).then(res => res.blob());
-    const imageFile = new File([imageBlob], "uploaded_image.png", { type: imageBlob.type });
+    const imageFile = new File([imageBlob], fileName ?? "noname", { type: imageBlob.type });
 
     toast.promise(
       uploadImage(imageFile),
