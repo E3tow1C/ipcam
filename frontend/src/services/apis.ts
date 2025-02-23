@@ -2,9 +2,11 @@ import { API_ROUTES } from '../constants/api-routes';
 
 const fetchAPI = async (url: string, method: string, body: any = null, token: string | null = null) => {
   try {
-    const headers: any = {
-      'Content-Type': 'application/json',
-    };
+    const headers: any = {};
+
+    if (body && !(body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -13,8 +15,8 @@ const fetchAPI = async (url: string, method: string, body: any = null, token: st
     const res = await fetch(url, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : null,
-      ...(!token && { credentials: 'include' })
+      body: body instanceof FormData ? body : body ? JSON.stringify(body) : null,
+      ...(!token && { credentials: 'include' }),
     });
 
     const data = await res.json();
@@ -44,11 +46,11 @@ export const getBlogs = async () => {
 export const uploadImage = async (image: File) => {
   try {
     const formData = new FormData();
-    formData.append('image', image);
+    formData.append('file', image);
 
     const response = await fetchAPI(API_ROUTES.UPLOAD, 'POST', formData);
     return response;
   } catch (error) {
     throw error;
   }
-}
+};

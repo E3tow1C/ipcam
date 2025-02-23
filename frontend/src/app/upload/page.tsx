@@ -55,7 +55,10 @@ export default function Home() {
     if (!imagePreview) return;
     const imageBlob = await fetch(imagePreview).then(res => res.blob());
     const imageFile = new File([imageBlob], "uploaded_image.png", { type: imageBlob.type });
-    await uploadImage(imageFile);
+    await uploadImage(imageFile).then(() => {
+      setImagePreview(null);
+    }
+    ).catch(err => alert(err.message));
   };
 
   return (
