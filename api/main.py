@@ -49,7 +49,7 @@ def read_item(item_id: int, q: Union[str, None] = None):
 def upload_image(file: UploadFile = File(...)):
     try:
         data = file.file.read()
-        object_name = file.filename
+        object_name = file.filename + "_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".jpg"
         minio_client.put_object(
             bucket_name,
             object_name,
