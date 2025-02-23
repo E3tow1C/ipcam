@@ -1,11 +1,12 @@
 'use client'
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 interface MenuItemProps {
   href: string;
-  icon: any;
+  icon: IconProp;
   label: string;
 }
 
