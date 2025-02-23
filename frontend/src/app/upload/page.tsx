@@ -4,6 +4,7 @@ import { faArrowLeft, faCircleCheck, faImage, faUpload } from "@fortawesome/free
 import Sidebar from "@/components/SideBar";
 import { useState } from "react";
 import { uploadImage } from "@/services/apis";
+import { Toaster, toast } from "react-hot-toast";
 
 export default function Home() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -55,14 +56,25 @@ export default function Home() {
     if (!imagePreview) return;
     const imageBlob = await fetch(imagePreview).then(res => res.blob());
     const imageFile = new File([imageBlob], "uploaded_image.png", { type: imageBlob.type });
-    await uploadImage(imageFile).then(() => {
-      setImagePreview(null);
-    }
-    ).catch(err => alert(err.message));
+
+    toast.promise(
+      uploadImage(imageFile),
+      {
+        loading: 'Uploading...',
+        success: 'Image uploaded successfully!',
+        error: (err) => `Upload failed: ${err.message}`,
+      },
+      {
+        position: "bottom-right",
+      }
+    );
+
+    setImagePreview(null);
   };
 
   return (
     <div className="h-screen flex flex-col">
+      <Toaster /> {/* ✅ Add Toaster component */}
       <div className="flex flex-1">
         <Sidebar />
         <div className="flex-1 relative">
