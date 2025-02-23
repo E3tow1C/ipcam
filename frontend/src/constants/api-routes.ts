@@ -4,4 +4,7 @@ export const API_ROUTES = {
   IPCAM: `${BASE_API_URL}/capture`,
   UPLOAD: `${BASE_API_URL}/upload`,
   HEALTH_CHECK: `${BASE_API_URL}/`,
+  IMAGES: {
+    ALL: `${BASE_API_URL}/images`,
+  }
 };

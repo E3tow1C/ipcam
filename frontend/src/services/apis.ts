@@ -61,3 +61,12 @@ export const captureImage = async (): Promise<string> => {
     throw error;
   }
 };
+
+export const getAllImages = async (): Promise<string[]> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.IMAGES.ALL, 'GET');
+    return response.all_image_urls;
+  } catch (error) {
+    throw error;
+  }
+};
