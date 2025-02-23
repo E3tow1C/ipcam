@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from datetime import datetime, timedelta
 from minio import Minio
 from pymongo import MongoClient
@@ -44,6 +44,39 @@ def read_root():
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
+
+@app.post("/upload")
+def upload_image(file: UploadFile = File(...)):
+    try:
+        data = file.file.read()
+        object_name = file.filename
+        minio_client.put_object(
+            bucket_name,
+            object_name,
+            io.BytesIO(data),
+            length=len(data),
+            content_type="image/jpeg",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Upload to MinIO failed: {str(e)}")
+
+    try:
+        image_url = minio_client.presigned_get_object(
+            bucket_name, object_name, expires=timedelta(days=7)
+        )
+        image_url = image_url.replace("http://minio:9000", "http://localhost:8000/storage")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
+
+    record = {
+        "timestamp": datetime.now(),
+        "object_name": object_name,
+        "image_url": image_url,
+    }
+    images_collection.insert_one(record)
+
+    return {"status": "completed", "image_url": image_url}
+
 
 
 @app.get("/capture")
