@@ -1,3 +1,4 @@
+from bson import ObjectId
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from datetime import datetime, timedelta
 from minio import Minio
@@ -55,11 +56,14 @@ def read_root():
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 
+
 @app.post("/upload")
 def upload_image(file: UploadFile = File(...)):
     try:
         data = file.file.read()
-        object_name = file.filename + "_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".jpg"
+        object_name = (
+            file.filename + "_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".jpg"
+        )
         minio_client.put_object(
             bucket_name,
             object_name,
@@ -74,7 +78,9 @@ def upload_image(file: UploadFile = File(...)):
         image_url = minio_client.presigned_get_object(
             bucket_name, object_name, expires=timedelta(days=7)
         )
-        image_url = image_url.replace("http://minio:9000", "http://localhost:8000/storage")
+        image_url = image_url.replace(
+            "http://minio:9000", "http://localhost:8000/storage"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
 
@@ -87,16 +93,48 @@ def upload_image(file: UploadFile = File(...)):
 
     return {"status": "completed", "image_url": image_url}
 
-@app.delete("/delete/{image_id}")
+
+@app.delete(
+    "/delete/{image_id}",
+    summary="Delete an image",
+    description="Delete an image from both MinIO storage and MongoDB",
+    responses={
+        200: {"description": "Image successfully deleted"},
+        404: {"description": "Image not found"},
+        500: {"description": "Internal server error"},
+    },
+)
 def delete_image(image_id: str):
     try:
-        record = images_collection.find_one_and_delete({"_id": image_id})
+        if not ObjectId.is_valid(image_id):
+            raise HTTPException(status_code=400, detail="Invalid image_id format")
+
+        record = images_collection.find_one_and_delete({"_id": ObjectId(image_id)})
+
+        if not record:
+            raise HTTPException(
+                status_code=404, detail=f"Image with id {image_id} not found"
+            )
+
         object_name = record["object_name"]
-        minio_client.remove_object(bucket_name, object_name)
+        try:
+            minio_client.remove_object(bucket_name, object_name)
+            return {
+                "status": "completed",
+                "message": f"Image {object_name} successfully deleted",
+            }
+        except Exception as minio_error:
+            images_collection.insert_one(record)
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to delete from storage: {str(minio_error)}",
+            )
+
+    except HTTPException as he:
+        raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Delete image failed: {str(e)}")
 
-    return {"status": "completed"}
 
 @app.get("/capture")
 def capture_image():
@@ -136,7 +174,9 @@ def capture_and_save_image():
     cap.release()
     if not ret:
         print("Unable to read frame from RTSP stream")
-        raise HTTPException(status_code=500, detail="Unable to read frame from RTSP stream")
+        raise HTTPException(
+            status_code=500, detail="Unable to read frame from RTSP stream"
+        )
 
     ret, buffer = cv2.imencode(".jpg", frame)
 
@@ -165,7 +205,9 @@ def capture_and_save_image():
         image_url = minio_client.presigned_get_object(
             bucket_name, object_name, expires=timedelta(days=7)
         )
-        image_url = image_url.replace("http://minio:9000", "http://localhost:8000/storage")
+        image_url = image_url.replace(
+            "http://minio:9000", "http://localhost:8000/storage"
+        )
         print(f"Image URL: {image_url}")
     except Exception as e:
         print(f"Generate URL failed: {str(e)}")
