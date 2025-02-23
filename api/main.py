@@ -44,7 +44,7 @@ if "images" not in db.list_collection_names():
 else:
     images_collection = db["images"]
 
-rtsp_url = "http://24.134.3.9/axis-cgi/mjpg/video.cgi"
+rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 
 @app.get("/")
