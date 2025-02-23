@@ -77,7 +77,16 @@ def upload_image(file: UploadFile = File(...)):
 
     return {"status": "completed", "image_url": image_url}
 
+@app.delete("/delete/{image_id}")
+def delete_image(image_id: str):
+    try:
+        record = images_collection.find_one_and_delete({"_id": image_id})
+        object_name = record["object_name"]
+        minio_client.remove_object(bucket_name, object_name)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Delete image failed: {str(e)}")
 
+    return {"status": "completed"}
 
 @app.get("/capture")
 def capture_image():
