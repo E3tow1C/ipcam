@@ -77,20 +77,20 @@ async def get_image(object_name: str):
 def capture_and_save_image():
     cap = cv2.VideoCapture(rtsp_url)
     if not cap.isOpened():
-        print("ไม่สามารถเชื่อมต่อกับ RTSP stream ได้")
-        raise HTTPException(status_code=500, detail="ไม่สามารถเชื่อมต่อกับ RTSP stream ได้")
+        print("Unable to connect to RTSP stream")
+        raise HTTPException(status_code=500, detail="Unable to connect to RTSP stream")
 
     ret, frame = cap.read()
     cap.release()
     if not ret:
-        print("ไม่สามารถอ่านเฟรมจาก RTSP stream ได้")
-        raise HTTPException(status_code=500, detail="ไม่สามารถอ่านเฟรมจาก RTSP stream ได้")
+        print("Unable to read frame from RTSP stream")
+        raise HTTPException(status_code=500, detail="Unable to read frame from RTSP stream")
 
     ret, buffer = cv2.imencode(".jpg", frame)
 
     if not ret:
-        print("ไม่สามารถเข้ารหัสภาพเป็น JPEG ได้")
-        raise HTTPException(status_code=500, detail="ไม่สามารถเข้ารหัสภาพเป็น JPEG ได้")
+        print("Unable to encode image as JPEG")
+        raise HTTPException(status_code=500, detail="Unable to encode image as JPEG")
 
     image_bytes = buffer.tobytes()
     timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
