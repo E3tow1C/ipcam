@@ -10,7 +10,7 @@ const Sidebar: React.FC = () => {
   return (
     <>
       <aside 
-        className={`fixed top-0 left-0 z-50 h-full bg-gray-100 p-6 transition-all duration-300 
+        className={`fixed top-0 left-0 z-50 h-full bg-gray-100 p-6 transition-all duration-300 animate-slide-in-left
         ${isSidebarVisible ? "max-w-[400px] w-full block" : "w-0 hidden"} 
         md:hidden`} 
       >

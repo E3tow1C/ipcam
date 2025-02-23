@@ -12,6 +12,15 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      animation: {
+        'slide-in-left': 'slide-in-left .3s ease-in-out',
+      },
+      keyframes: {
+        'slide-in-left': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+      }
     },
   },
   plugins: [],
