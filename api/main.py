@@ -16,9 +16,9 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"], 
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -140,6 +140,13 @@ def delete_image(image_id: str):
 def capture_image():
     image_url = capture_and_save_image()
     return {"status": "completed", "image_url": image_url}
+
+
+@app.get("/images")
+def get_images():
+    records = images_collection.find({})
+    all_image_urls = [record["image_url"] for record in records]
+    return {"all_image_urls": all_image_urls}
 
 
 @app.get("/storage/images/{object_name}")
