@@ -1,8 +1,5 @@
 'use client'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartPie, faLock } from "@fortawesome/free-solid-svg-icons";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+
 import Sidebar from "@/components/SideBar";
 
 export default function Home() {

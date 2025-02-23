@@ -1,6 +1,6 @@
 'use client'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCameraAlt, faCircleDot, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+import { faCameraAlt, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "@/components/SideBar";
 import { captureImage } from "@/services/apis";
 import { useState } from "react";
