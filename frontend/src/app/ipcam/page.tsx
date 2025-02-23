@@ -54,7 +54,7 @@ export default function Home() {
             </div>
             <div className="w-[90%] max-w-[800px] mx-auto my-5 bg-white z-10">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {captureImageList.map((image, index) => (
+                {captureImageList.reverse().map((image, index) => (
                   <div key={index} className="relative">
                     <img
                       src={image}
