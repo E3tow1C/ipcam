@@ -24,7 +24,7 @@ export default async function Home() {
                     <img
                       src={img}
                       alt={`Image ${index + 1}`}
-                      className="w-full h-full rounded-lg object-cover"
+                      className="w-full h-64 rounded-lg object-cover"
                     />
                   </div>
                 ))}
