@@ -70,3 +70,56 @@ export const getAllImages = async (): Promise<string[]> => {
     throw error;
   }
 };
+
+export type CameraData = {
+  _id: { $oid: string };
+  name: string;
+  url: string;
+  location: string;
+};
+
+export const getAllCameras = async (): Promise<CameraData[]> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.CAMERAS.ALL, 'GET');
+    return response.cameras;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getCamerasByLocation = async (location: string): Promise<CameraData[]> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.CAMERAS.BY_LOCATION(location), 'GET');
+    return response.cameras;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const addCamera = async (camera: CameraData): Promise<CameraData> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.CAMERA.POST, 'POST', camera);
+    return response.camera;
+  }
+  catch (error) {
+    throw error;
+  }
+};
+
+export const getCameraById = async (id: string): Promise<CameraData> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.CAMERA.BY_ID(id), 'GET');
+    return response.camera;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const captureCameraImage = async (id: string): Promise<string> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.CAMERA.CAPTURE(id), 'GET');
+    return response.image_url;
+  } catch (error) {
+    throw error;
+  }
+};
