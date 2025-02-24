@@ -12,11 +12,16 @@ interface MenuItemProps {
 
 const MenuItem: React.FC<MenuItemProps> = ({ href, icon, label }) => {
   const currentPath = usePathname();
+  const isActive = currentPath === href || currentPath.startsWith(`${href}/`);
   
   return (
     <Link
       href={href}
-      className={`block py-2 px-4 rounded-lg box-content ${currentPath === href ? "bg-white text-gray-600 border" : "text-gray-500 border border-gray-100 hover:bg-white hover:bg-opacity-90 transition-all"}`}
+      className={`block py-2 px-4 rounded-lg box-content ${
+        isActive 
+          ? "bg-white text-gray-600 border" 
+          : "text-gray-500 border border-gray-100 hover:bg-white hover:bg-opacity-90 transition-all"
+      }`}
     >
       <FontAwesomeIcon icon={icon} className="mr-2 w-6" />
       {label}

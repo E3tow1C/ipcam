@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCameraAlt, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+import { faAngleLeft, faCameraAlt, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "@/components/SideBar";
 import { CameraData, getCameraById } from "@/services/apis";
 import { Toaster, toast } from "react-hot-toast";
@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { view } = await params;
   
   return {
-    title: `IP Camera - ${view}`,
+    title: `IP Camera View`,
     description: `Live view from camera ID: ${view}`,
   };
 }
@@ -42,7 +42,7 @@ export default async function Page({
         <div className="flex-1 relative h-svh overflow-scroll">
           <nav className="w-full bg-gradient-to-br h-52 from-blue-500 to-blue-400">
             <h1 className="text-2xl px-12 ml-8 md:ml-0 py-7 md:py-9 font-bold text-white flex items-center">
-              <Link href={`/ipcam`}>IP Camera</Link> 
+              <Link href={`/ipcam`}><FontAwesomeIcon icon={faAngleLeft} className="h-6 w-6 mr-1"/>IP Camera</Link> 
               <span className="text-gray-200 ml-2 font-normal"><span>/</span> {camera.name}</span>
             </h1>
           </nav>

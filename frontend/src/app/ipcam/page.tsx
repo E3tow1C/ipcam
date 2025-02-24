@@ -24,8 +24,8 @@ export default async function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {
               cameras.map((camera, index) => (
-                <Link key={index} className="bg-gray-50 border rounded-xl hover:bg-gray-100 transition-all flex p-4" href={`/ipcam/${camera._id}`}>
-                  <div className="bg-gray-800 rounded-xl w-3/5 h-48 shadow-xl flex items-center justify-center text-white text-center relative">
+                <Link key={index} className="bg-gray-50 border rounded-xl hover:bg-gray-100 transition-all p-4" href={`/ipcam/${camera._id}`}>
+                  <div className="bg-gray-800 rounded-xl h-80 shadow-xl flex items-center justify-center text-white text-center relative">
                     <img
                       src={camera.url}
                       alt="ipcam"
@@ -36,7 +36,7 @@ export default async function Home() {
                     </div>
                   </div>
                   <div>
-                    <div className="ml-4">
+                    <div className="mt-4">
                       <h2 className="text-lg font-bold">{camera.name}</h2>
                       <p className="text-gray-500">{camera.location}</p>
                     </div>
