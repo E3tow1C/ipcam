@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File
 from datetime import datetime, timedelta
 from minio import Minio
 from pymongo import MongoClient
+from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,11 +42,18 @@ if not minio_client.bucket_exists(BUCKET_NAME):
 mongo_client = MongoClient("mongodb://root:password@mongodb:27017/")
 db = mongo_client["camera_db"]
 images_collection = db["images"]
+camera_collection = db["cameras"]
 if "images" not in db.list_collection_names():
     images_collection = db.create_collection("images")
     print("Database and collection 'images' created.")
 else:
     images_collection = db["images"]
+
+if "cameras" not in db.list_collection_names():
+    camera_collection = db.create_collection("cameras")
+    print("Database and collection 'cameras' created.")
+else:
+    camera_collection = db["cameras"]
 
 rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
@@ -203,6 +211,133 @@ async def get_image(object_name: str):
             detail=f"Image not found or error accessing image: {str(e)}",
         )
 
+@app.get("/cameras")
+def get_cameras():
+    records = camera_collection.find({})
+    all_cameras = [record for record in records]
+    cameras = []
+    for camera in all_cameras:
+        camera["_id"] = str(camera["_id"])
+        cameras.append(camera)
+    return {"cameras": cameras}
+    
+@app.get("/camera/{camera_id}")
+def get_camera(camera_id: str):
+    record = camera_collection.find_one({"_id": ObjectId(camera_id)})
+    if record:
+        camera = record
+        camera = {**camera, "_id": str(camera["_id"])}
+        return {"camera": camera}
+    else:
+        raise HTTPException(status_code=404, detail="Camera not found")
+    
+@app.get("/cameras/location/{location}")
+def get_camera_by_location(location: str):
+    records = camera_collection.find({"location": location})
+    all_cameras = [record for record in records]
+    cameras = []
+    for camera in all_cameras:
+        camera["_id"] = str(camera["_id"])
+        cameras.append(camera)
+    return {"cameras": cameras}
+    
+@app.get("/camera/{camera_id}/capture")
+def capture_image_from_camera(camera_id: str):
+    camera = camera_collection.find_one({"_id": ObjectId(camera_id)})
+    if camera:
+        rtsp_url = camera["url"]
+        image_url = capture_and_save_image_from_camera(camera_id, rtsp_url)
+        return {"status": "completed", "image_url": image_url}
+    else:
+        raise HTTPException(status_code=404, detail="Camera not found")
+    
+@app.delete("/camera/{camera_id}")
+def delete_camera(camera_id: str):
+    camera = camera_collection.find_one_and_delete({"_id": ObjectId(camera_id)})
+    if camera:
+        return {"status": "completed", "camera": camera}
+    else:
+        raise HTTPException(status_code=404, detail="Camera not found")
+
+class CameraCreate(BaseModel):
+    name: str
+    url: str
+    location: str
+
+@app.post("/camera")
+def add_camera(camera: CameraCreate):
+    camera_dict = {
+        "name": camera.name,
+        "url": camera.url,
+        "location": camera.location
+    }
+    result = camera_collection.insert_one(camera_dict)
+    return {
+        "status": "completed", 
+        "camera": {
+            **camera_dict,
+            "_id": str(result.inserted_id)
+        }
+    }
+
+    
+def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
+    cap = cv2.VideoCapture(cam_rtsp_url)
+    if not cap.isOpened():
+        print("Unable to connect to RTSP stream")
+        raise HTTPException(status_code=500, detail="Unable to connect to RTSP stream")
+    
+    ret, frame = cap.read()
+    cap.release()
+    if not ret:
+        print("Unable to read frame from RTSP stream")
+        raise HTTPException(status_code=500, detail="Unable to read frame from RTSP stream")
+    
+    ret, buffer = cv2.imencode(".jpg", frame)
+
+    if not ret:
+        print("Unable to encode image as JPEG")
+        raise HTTPException(status_code=500, detail="Unable to encode image as JPEG")
+    
+    image_bytes = buffer.tobytes()
+    timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
+    object_name = f"captured_{uuid.uuid4()}_{timestamp_str}.jpg"
+    
+    try:
+        data = io.BytesIO(image_bytes)
+        minio_client.put_object(
+            BUCKET_NAME,
+            object_name,
+            data,
+            length=len(image_bytes),
+            content_type="image/jpeg",
+        )
+    except Exception as e:
+        print(f"Upload to MinIO failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Upload to MinIO failed: {str(e)}")
+    
+    try:
+        image_url = minio_client.presigned_get_object(
+            BUCKET_NAME, object_name, expires=timedelta(days=7)
+        )
+        image_url = image_url.replace(
+            "http://minio:9000", "http://localhost:8000/storage"
+        )
+        print(f"Image URL: {image_url}")
+    except Exception as e:
+        print(f"Generate URL failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
+    
+    record = {
+        "timestamp": datetime.now(),
+        "type": "capture",
+        "object_name": object_name,
+        "original_filename": object_name,
+        "camera_id": camera_id,
+        "image_url": image_url,
+    }
+    images_collection.insert_one(record)
+    return image_url
 
 def capture_and_save_image():
     cap = cv2.VideoCapture(rtsp_url)
