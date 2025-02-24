@@ -10,7 +10,7 @@ export default async function Home() {
     <div className="h-screen flex flex-col">
       <div className="flex flex-1">
         <Sidebar />
-        <div className="flex-1 px-12 py-7 md:py-9">
+        <div className="flex-1 px-12 py-7 md:py-9 h-svh overflow-scroll">
           <nav className="w-full flex items-center">
             <h1 className="text-2xl ml-8 md:ml-0 font-bold text-gray-700 flex items-center">
               Images Gallery

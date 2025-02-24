@@ -21,7 +21,7 @@ export default function Home() {
     <div className="h-screen flex flex-col">
       <div className="flex flex-1">
         <Sidebar />
-        <div className="flex-1 relative h-screen overflow-scroll">
+        <div className="flex-1 relative h-svh overflow-scroll">
           <nav className="w-full bg-gradient-to-br h-52 from-blue-500 to-blue-400">
             <h1 className="text-2xl px-12 ml-8 md:ml-0 py-7 md:py-9 font-bold text-white flex items-center">
               IP Camera
@@ -41,7 +41,7 @@ export default function Home() {
             </div>
             <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
               <div className="flex items-center justify-between p-3">
-                <h2 className="text-lg font-bold">IP Camera</h2>
+                <h2 className="text-lg font-bold ml-2">IP Camera</h2>
                 <button className="bg-blue-500 text-white px-3 py-2 rounded-md disabled:opacity-70" onClick={handleCapture} disabled={isCapturing}>
                   {
                     isCapturing ? (

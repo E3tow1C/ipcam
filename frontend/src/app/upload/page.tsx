@@ -83,7 +83,7 @@ export default function Home() {
       <Toaster /> {/* ✅ Add Toaster component */}
       <div className="flex flex-1">
         <Sidebar />
-        <div className="flex-1 relative">
+        <div className="flex-1 relative h-svh overflow-scroll">
           <nav className="w-full bg-gradient-to-br h-52 from-blue-500 to-blue-400">
             <h1 className="text-2xl px-12 ml-8 md:ml-0 py-7 md:py-9 font-bold text-white flex items-center">
               Upload Image
