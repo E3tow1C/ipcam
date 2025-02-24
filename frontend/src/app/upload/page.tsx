@@ -80,7 +80,7 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col">
-      <Toaster /> {/* ✅ Add Toaster component */}
+      <Toaster />
       <div className="flex flex-1">
         <Sidebar />
         <div className="flex-1 relative h-svh overflow-scroll">

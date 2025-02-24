@@ -16,19 +16,19 @@ export default function Home() {
           <main className="mt-8">
             {/* Metric Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="p-6 bg-white shadow rounded-lg">
+              <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Total Users</p>
                 <h2 className="mt-2 text-xl font-bold">1,234</h2>
               </div>
-              <div className="p-6 bg-white shadow rounded-lg">
+              <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">New Signups</p>
                 <h2 className="mt-2 text-xl font-bold">567</h2>
               </div>
-              <div className="p-6 bg-white shadow rounded-lg">
+              <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Revenue</p>
                 <h2 className="mt-2 text-xl font-bold">$12,345</h2>
               </div>
-              <div className="p-6 bg-white shadow rounded-lg">
+              <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Active Sessions</p>
                 <h2 className="mt-2 text-xl font-bold">89</h2>
               </div>

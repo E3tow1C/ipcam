@@ -4,6 +4,7 @@ import { faCameraAlt, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "@/components/SideBar";
 import { captureImage } from "@/services/apis";
 import { useState } from "react";
+import { Toaster, toast } from "react-hot-toast";
 
 export default function Home() {
   const [captureImageList, setCaptureImageList] = useState<string[]>([]);
@@ -12,13 +13,29 @@ export default function Home() {
   const handleCapture = async () => {
     if (isCapturing) return;
     setIsCapturing(true);
-    const response = await captureImage();
-    setCaptureImageList([...captureImageList, response]);
-    setIsCapturing(false);
+    toast.promise(
+      captureImage(),
+      {
+        loading: 'Capturing image...',
+        success: (data) => {
+          setCaptureImageList((prev) => [...prev, data]);
+          setIsCapturing(false);
+          return 'Image captured successfully';
+        },
+        error: (error) => {
+          setIsCapturing(false);
+          return error.message;
+        }
+      },
+      {
+        position: "bottom-right",
+      }
+    );
   }
 
   return (
     <div className="h-screen flex flex-col">
+      <Toaster />
       <div className="flex flex-1">
         <Sidebar />
         <div className="flex-1 relative h-svh overflow-scroll">
