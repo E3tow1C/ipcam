@@ -4,10 +4,10 @@ metadata:
   name: fastapi-ingress
   annotations:
     spec.ingressClassName: "nginx"
-    # nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-    - http:
+    - host: fastapi.localhost
+      http:
         paths:
           - path: /
             pathType: Prefix
@@ -16,10 +16,23 @@ spec:
                 name: fastapi
                 port:
                   number: 8000
-          # - path: /minioconsole(/|$)(.*)
-          #   pathType: ImplementationSpecific
-          #   backend:
-          #     service:
-          #       name: minio
-          #       port:
-          #         number: 9001
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-console-ingress
+  annotations:
+    spec.ingressClassName: "nginx"
+spec:
+  rules:
+    - host: minio.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio
+                port:
+                  number: 9001
