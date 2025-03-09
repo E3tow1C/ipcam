@@ -6,7 +6,7 @@ if [ "$(uname)" = "Darwin" ]; then
   SHELL_TO_USE="zsh"
 elif [ -f "/etc/os-release" ] && grep -q "Ubuntu" /etc/os-release; then
   # Ubuntu detected
-  SHELL_TO_USE="bash"
+  SHELL_TO_USE="sh"
 else
   # Default to bash for other systems
   SHELL_TO_USE="bash"
