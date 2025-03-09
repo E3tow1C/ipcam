@@ -1,3 +1,4 @@
+import os
 from bson import ObjectId
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from datetime import datetime, timedelta
@@ -15,6 +16,9 @@ import io
 import uuid
 
 BUCKET_NAME = "images"
+MINIO_HOST = os.getenv("MINIO_HOST", "minio:9000")
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://root:password@mongodb:27017/")
+API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL", "http://localhost:8000")
 
 app = FastAPI()
 
@@ -28,7 +32,7 @@ app.add_middleware(
 
 
 minio_client = Minio(
-    "minio:9000",
+    MINIO_HOST,
     access_key="root",
     secret_key="password",
     region="us-east-1",
@@ -39,7 +43,7 @@ minio_client = Minio(
 if not minio_client.bucket_exists(BUCKET_NAME):
     minio_client.make_bucket(BUCKET_NAME)
 
-mongo_client = MongoClient("mongodb://root:password@mongodb:27017/")
+mongo_client = MongoClient(MONGO_URL)
 db = mongo_client["camera_db"]
 images_collection = db["images"]
 camera_collection = db["cameras"]
@@ -85,7 +89,7 @@ def upload_image(file: UploadFile = File(...)):
             BUCKET_NAME, object_name, expires=timedelta(days=7)
         )
         image_url = image_url.replace(
-            "http://minio:9000", "http://localhost:8000/storage"
+            "http://minio:9000", f"{API_EXTERNAL_URL}/storage"
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
@@ -321,7 +325,7 @@ def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
             BUCKET_NAME, object_name, expires=timedelta(days=7)
         )
         image_url = image_url.replace(
-            "http://minio:9000", "http://localhost:8000/storage"
+            "http://minio:9000", f"{API_EXTERNAL_URL}/storage"
         )
         print(f"Image URL: {image_url}")
     except Exception as e:
@@ -381,7 +385,7 @@ def capture_and_save_image():
             BUCKET_NAME, object_name, expires=timedelta(days=7)
         )
         image_url = image_url.replace(
-            "http://minio:9000", "http://localhost:8000/storage"
+            "http://minio:9000", f"{API_EXTERNAL_URL}/storage"
         )
         print(f"Image URL: {image_url}")
     except Exception as e:
