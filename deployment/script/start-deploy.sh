@@ -39,6 +39,7 @@ kind load docker-image ipcam-fastapi:latest --name ipcam-cluster
 # echo "📦 Loading Frontend image into Kind..."
 # kind load docker-image ipcam-frontend:latest --name ipcam-cluster
 
+
 # Apply Kubernetes manifests
 echo "🚀 Applying Kubernetes manifests..."
 kubectl apply -f pvc.yml
@@ -55,6 +56,7 @@ echo "⏳ Waiting for deployments to be ready..."
 kubectl wait --for=condition=available --timeout=300s deployment/mongodb
 kubectl wait --for=condition=available --timeout=300s deployment/minio
 kubectl wait --for=condition=available --timeout=300s deployment/fastapi
+kubectl wait --for=condition=available --timeout=300s deployment/ingress-nginx-controller -n ingress-nginx
 # kubectl wait --for=condition=available --timeout=300s deployment/frontend
 
 echo "✅ Deployment completed successfully!"
