@@ -45,6 +45,8 @@ kubectl apply -f pvc.yml
 kubectl apply -f configmaps.yml
 kubectl apply -f deployments.yml
 kubectl apply -f services.yml
+kubectl apply -f ingress.yml
+kubectl apply -f scaling.yml
 # kubectl apply -f frontend-deployment.yml
 
 # Wait for deployments to be ready
