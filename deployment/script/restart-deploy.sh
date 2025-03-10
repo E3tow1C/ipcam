@@ -1,5 +1,3 @@
-#!/usr/bin/env sh
-
 # Detect OS and set appropriate shell
 if [ "$(uname)" = "Darwin" ]; then
   SHELL_TO_USE="zsh"
