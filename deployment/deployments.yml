@@ -153,7 +153,7 @@ spec:
                 ]
       containers:
         - name: fastapi
-          image: e3tow1c/ipcam-fastapi:1.1
+          image: e3tow1c/ipcam-fastapi:1.2
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:
