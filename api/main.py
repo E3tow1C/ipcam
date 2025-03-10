@@ -18,7 +18,7 @@ import uuid
 BUCKET_NAME = "images"
 MINIO_HOST = os.getenv("MINIO_HOST", "minio:9000")
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://root:password@mongodb:27017/")
-API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL", "http://fastapi.localhost:8000")
+API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL", "http://fastapi.localhost:8080")
 
 app = FastAPI()
 
@@ -64,7 +64,7 @@ rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World init project"}
+    return {"Hello": "World init project | version 1.1 test update with rolling update"}
 
 
 @app.post("/upload")
