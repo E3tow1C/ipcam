@@ -36,7 +36,7 @@ kubectl config use-context kind-ipcam-cluster
 # docker build -t ipcam-fastapi:latest ../api
 
 echo "📦 Loading FastAPI image into Kind..."
-kind load docker-image ipcam-fastapi:latest --name ipcam-cluster
+kind load docker-image e3tow1c/ipcam-fastapi:latest --name ipcam-cluster
 
 # # Build and load the Frontend image (optional)
 # echo "🔨 Building Frontend image..."
