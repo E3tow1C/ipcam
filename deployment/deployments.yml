@@ -110,7 +110,7 @@ spec:
             ]
       containers:
         - name: fastapi
-          image: ipcam-fastapi:latest
+          image: e3tow1c/ipcam-fastapi:latest
           imagePullPolicy: IfNotPresent
           resources:
             limits:
