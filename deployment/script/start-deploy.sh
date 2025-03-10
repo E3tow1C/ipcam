@@ -4,7 +4,17 @@
 if [ "$(uname)" = "Darwin" ]; then
   # macOS detected
   SHELL_TO_USE="zsh"
-  echo "📌 Detected OS: $(uname), using $SHELL_TO_USE..."
+elif [ -f "/etc/os-release" ] && grep -q "Ubuntu" /etc/os-release; then
+  # Ubuntu detected
+  SHELL_TO_USE="bash"
+else
+  SHELL_TO_USE="bash"
+fi
+
+echo "📌 Detected OS: $(uname), using $SHELL_TO_USE..."
+
+# Re-execute the script with the appropriate shell if needed
+if [ "$(basename "$SHELL")" != "$SHELL_TO_USE" ]; then
   exec "$SHELL_TO_USE" "$0" "$@"
 fi
 
@@ -46,7 +56,6 @@ kubectl config use-context kind-ipcam-cluster
 
 # echo "📦 Loading Frontend image into Kind..."
 # kind load docker-image ipcam-frontend:latest --name ipcam-cluster
-
 
 # Apply Kubernetes manifests
 echo "🚀 Applying Kubernetes manifests..."

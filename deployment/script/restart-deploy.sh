@@ -2,9 +2,17 @@
 
 # Detect OS and set appropriate shell
 if [ "$(uname)" = "Darwin" ]; then
-  # macOS detected
   SHELL_TO_USE="zsh"
-  echo "📌 Detected OS: $(uname), using $SHELL_TO_USE..."
+elif [ -f "/etc/os-release" ] && grep -q "Ubuntu" /etc/os-release; then
+  SHELL_TO_USE="bash"
+else
+  SHELL_TO_USE="bash"
+fi
+
+echo "📌 Detected OS: $(uname), using $SHELL_TO_USE..."
+
+# Re-execute the script with the appropriate shell if needed
+if [ "$(basename "$SHELL")" != "$SHELL_TO_USE" ]; then
   exec "$SHELL_TO_USE" "$0" "$@"
 fi
 
@@ -19,7 +27,6 @@ kubectl delete deployment mongodb minio fastapi --ignore-not-found=true
 # Wait for pods to terminate
 echo "⏳ Waiting for pods to terminate..."
 sleep 5
-
 
 # Apply the updated manifests
 kubectl apply -f pvc.yml
