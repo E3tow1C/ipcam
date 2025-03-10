@@ -64,7 +64,7 @@ rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World init project | version 1.1 test update with rolling update"}
+    return {"Hello": "World init project | version 1.2 test update with rolling update"}
 
 
 @app.post("/upload")
