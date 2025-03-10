@@ -18,7 +18,7 @@ import uuid
 BUCKET_NAME = "images"
 MINIO_HOST = os.getenv("MINIO_HOST", "minio:9000")
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://root:password@mongodb:27017/")
-API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL", "http://localhost:8000")
+API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL", "http://fastapi.localhost:8000")
 
 app = FastAPI()
 
