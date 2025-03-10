@@ -4,6 +4,11 @@ metadata:
   name: fastapi-ingress
   annotations:
     spec.ingressClassName: "nginx"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "*"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
 spec:
   rules:
     - host: fastapi.localhost
