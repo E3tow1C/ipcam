@@ -83,17 +83,17 @@ spec:
   selector:
     matchLabels:
       app: fastapi
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1 # During a deployment update, Kubernetes is allowed to create up to 1 extra pod above your desired replica count. | With your replicas: 3 setting, this means that momentarily up to 4 pods can exist (3 desired + 1 surge). | This allows new pods to start up and become ready while old pods are still serving traffic
+      maxUnavailable: 0 # During a deployment update, Kubernetes is allowed to delete all pods except one. | This means that at least one pod will always be available to serve traffic
   template:
     metadata:
       labels:
         app: fastapi
     spec:
-      replicas: 1
-      strategy:
-        type: rollingUpdate
-        rollingUpdate:
-          maxSurge: 1 # During a deployment update, Kubernetes is allowed to create up to 1 extra pod above your desired replica count. | With your replicas: 3 setting, this means that momentarily up to 4 pods can exist (3 desired + 1 surge). | This allows new pods to start up and become ready while old pods are still serving traffic
-          maxUnavailable: 0 # During a deployment update, Kubernetes is allowed to delete all pods except one. | This means that at least one pod will always be available to serve traffic
       initContainers:
         - name: wait-for-dependencies
           image: alpine:latest
