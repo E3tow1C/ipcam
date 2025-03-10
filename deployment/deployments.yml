@@ -94,31 +94,75 @@ spec:
       labels:
         app: fastapi
     spec:
+      terminationGracePeriodSeconds: 30
+      restartPolicy: Always
       initContainers:
         - name: wait-for-dependencies
           image: alpine:latest
           command: [
-              "sh",
-              "-c",
-              'apk add --no-cache curl netcat-openbsd;
-              echo "Waiting for MinIO...";
-              until curl -s http://minio:9000 > /dev/null; do
-              echo "MinIO not ready yet...";
-              sleep 5;
-              done;
-              echo "MinIO is up";
-              echo "Waiting for MongoDB...";
-              until nc -z -w2 mongodb 27017; do
-              echo "MongoDB not ready yet...";
-              sleep 5;
-              done;
-              echo "MongoDB is up"',
-            ]
+                    "sh",
+                    "-c",
+                    'apk add --no-cache curl netcat-openbsd;
+                    
+                    # First check service existence
+                    echo "Verifying service DNS resolution...";
+                    MINIO_RESOLVED=$(getent hosts minio | wc -l);
+                    MONGODB_RESOLVED=$(getent hosts mongodb | wc -l);
+                    
+                    if [ "$MINIO_RESOLVED" -eq "0" ]; then
+                      echo "WARNING: MinIO service not found in DNS";
+                    else
+                      echo "MinIO service found in DNS";
+                    fi;
+                    
+                    if [ "$MONGODB_RESOLVED" -eq "0" ]; then
+                      echo "WARNING: MongoDB service not found in DNS";
+                    else
+                      echo "MongoDB service found in DNS";
+                    fi;
+                    
+                    # Max 10 attempts (50 seconds total) instead of 20
+                    MAX_ATTEMPTS=10;
+                    
+                    # Check MinIO
+                    echo "Checking MinIO availability...";
+                    for i in $(seq 1 $MAX_ATTEMPTS); do
+                      if curl -s -m 2 http://minio:9000/minio/health/live > /dev/null || curl -s -m 2 http://minio:9000 > /dev/null; then
+                        echo "MinIO is responding";
+                        MINIO_READY=true;
+                        break;
+                      fi;
+                      echo "MinIO check attempt $i/$MAX_ATTEMPTS failed, retrying...";
+                      sleep 5;
+                    done;
+                    
+                    # Check MongoDB 
+                    echo "Checking MongoDB availability...";
+                    for i in $(seq 1 $MAX_ATTEMPTS); do
+                      if nc -z -w2 mongodb 27017; then
+                        echo "MongoDB is responding";
+                        MONGODB_READY=true;
+                        break;
+                      fi;
+                      echo "MongoDB check attempt $i/$MAX_ATTEMPTS failed, retrying...";
+                      sleep 5;
+                    done;
+                    
+                    # Continue regardless of results
+                    echo "Dependency checks completed, proceeding with FastAPI startup"'
+                ]
       containers:
         - name: fastapi
           image: e3tow1c/ipcam-fastapi:1.1
           imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]
           resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
             limits:
               memory: "512Mi"
               cpu: "500m"
@@ -127,6 +171,30 @@ spec:
           envFrom:
             - configMapRef:
                 name: fastapi-config
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 15
+            failureThreshold: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
 # ---
 # apiVersion: apps/v1
 # kind: Deployment
