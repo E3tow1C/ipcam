@@ -16,6 +16,7 @@ echo "📌 Detected OS: $(uname), using $SHELL_TO_USE..."
 # Re-execute the script with the appropriate shell if needed
 if [ "$(basename "$SHELL")" != "$SHELL_TO_USE" ]; then
   exec "$SHELL_TO_USE" "$0" "$@"
+  echo "using $SHELL_TO_USE"
 fi
 
 # Exit on error
