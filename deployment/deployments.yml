@@ -11,6 +11,10 @@ spec:
       labels:
         app: mongodb
     spec:
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+        runAsGroup: 999
       containers:
         - name: mongodb
           image: mongo:4.4
@@ -26,13 +30,15 @@ spec:
           volumeMounts:
             - name: mongodb-data
               mountPath: /data/db
-            - name: mongodb-data
+            - name: mongodb-configdb
               mountPath: /data/configdb
-              subPath: configdb
       volumes:
         - name: mongodb-data
           persistentVolumeClaim:
-            claimName: mongodb-pvc
+            claimName: mongodb-data-pvc
+        - name: mongodb-configdb
+          persistentVolumeClaim:
+            claimName: mongodb-config-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
