@@ -28,7 +28,7 @@ kubectl delete -f configmaps.yml || true
 kubectl delete -f pvc.yml || true
 
 echo "⏳ Waiting for all pods to terminate..."
-while [ "$(kubectl get pods --all-namespaces --no-headers | wc -l)" -ne 0 ]; do
+while [ "$(kubectl get pods --no-headers | wc -l)" -ne 0 ]; do
     echo "Still waiting..."
     sleep 5
 done
