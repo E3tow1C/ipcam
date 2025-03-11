@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Sidebar from "@/components/SideBar";
 import { getAllImages } from "@/services/apis";
 import { faImage } from "@fortawesome/free-solid-svg-icons";

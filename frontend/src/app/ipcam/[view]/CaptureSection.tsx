@@ -1,5 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
-import { captureCameraImage, captureImage } from "@/services/apis";
+import { captureCameraImage } from "@/services/apis";
 import { faCircleNotch, faCameraAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";

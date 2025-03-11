@@ -1,8 +1,7 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCameraAlt, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+/* eslint-disable @next/next/no-img-element */
 import Sidebar from "@/components/SideBar";
-import { captureImage, getAllCameras } from "@/services/apis";
-import { Toaster, toast } from "react-hot-toast";
+import { getAllCameras } from "@/services/apis";
+import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 
 export default async function Home() {

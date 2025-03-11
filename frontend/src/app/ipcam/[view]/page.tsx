@@ -1,11 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 import { notFound } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faCameraAlt, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "@/components/SideBar";
 import { CameraData, getCameraById } from "@/services/apis";
-import { Toaster, toast } from "react-hot-toast";
-import { captureImage } from "@/services/apis";
-import CaptureButton from "./CaptureSection";
+import { Toaster } from "react-hot-toast";
 import CaptureSection from "./CaptureSection";
 import Link from "next/link";
 
