@@ -20,6 +20,13 @@ fi
 # Exit on error
 set -e
 
+# Check if current directory is deployment
+if [ ! -f "config/kind-cluster.yml" ]; then
+    echo "❌ Please run this script from the deployment directory."
+    echo "   make sure your're at 'deployment' directory"
+    exit 1
+fi
+
 echo "🚀 Starting the deployment process..."
 
 # Check if Kind is installed
@@ -29,16 +36,25 @@ if ! command -v kind &> /dev/null; then
     exit 1
 fi
 
+# Use envsubst to replace variables in the Kubernetes manifests
+echo "🔧 Updating Kubernetes manifests..."
+envsubst < config/kind-cluster.yml > config/kind-cluster-generated.yml
+
 # Create Kind cluster if it doesn't exist
 if ! kind get clusters | grep -q "ipcam-cluster"; then
     echo "🔧 Creating Kind cluster..."
-    kind create cluster --name ipcam-cluster --config config/kind-cluster.yml
+    kind create cluster --name ipcam-cluster --config config/kind-cluster-generated.yml
 else
     echo "✅ Kind cluster already exists."
 fi
 
 # Switch kubectl context to the kind cluster
 kubectl config use-context kind-ipcam-cluster
+
+# Clean up the generated Kubernetes manifest
+echo "🧹 Cleaning up generated manifests files..."
+git clean -f config/kind-cluster-generated.yml || { echo "❌ Failed to clean up generated files"; exit 1; }
+echo "✅ Clean up completed successfully"
 
 # Build and load the FastAPI image
 # echo "🔨 Building FastAPI image..."
@@ -88,7 +104,7 @@ echo
 echo "=========================================="
 echo "🔒 Setting permissions for kubes-data directory"
 echo "=========================================="
-sudo chmod -R 750 "${DATA_DIR}" || { echo "❌ Failed to set permissions for kubes-data"; exit 1; }
+sudo chmod -R 777 "${DATA_DIR}" || { echo "❌ Failed to set permissions for kubes-data"; exit 1; }
 echo "✅ Permissions set success: kubes-data directory"
 echo
 
