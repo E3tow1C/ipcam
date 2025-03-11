@@ -27,6 +27,14 @@ kubectl delete -f deployments.yml || true
 kubectl delete -f configmaps.yml || true
 kubectl delete -f pvc.yml || true
 
+echo "⏳ Waiting for all pods to terminate..."
+while [ "$(kubectl get pods --all-namespaces --no-headers | wc -l)" -ne 0 ]; do
+    echo "Still waiting..."
+    sleep 5
+done
+echo "All pods have terminated."
+
+
 echo "Deleting the Kind cluster..."
 kind delete cluster --name ipcam-cluster || true
 
