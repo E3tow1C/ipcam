@@ -76,37 +76,45 @@ DATA_DIR="${HOME}/kubes-data"
 echo "📁 Using data directory: ${DATA_DIR}"
 echo
 
-# Create directories for persistent storage
-echo "=========================================="
-echo "📁 Creating data directories..."
-echo "=========================================="
-mkdir -p "${DATA_DIR}/mongodb/db" || { echo "❌ Failed to create MongoDB data directory"; exit 1; }
-mkdir -p "${DATA_DIR}/mongodb/configdb" || { echo "❌ Failed to create MongoDB config directory"; exit 1; }
-mkdir -p "${DATA_DIR}/minio" || { echo "❌ Failed to create MinIO directory"; exit 1; }
-echo "✅ Data directories created successfully"
-echo
+# Check if the kubes-data directory exists
+if [ -d "$DATA_DIR" ]; then
+    echo "=========================================="
+    echo "✅ Data directories already exist. Skipping directory creation and permission setting."
+    echo "=========================================="
+    echo
+else
+    # Create directories for persistent storage
+    echo "=========================================="
+    echo "📁 Creating data directories..."
+    echo "=========================================="
+    mkdir -p "${DATA_DIR}/mongodb/db" || { echo "❌ Failed to create MongoDB data directory"; exit 1; }
+    mkdir -p "${DATA_DIR}/mongodb/configdb" || { echo "❌ Failed to create MongoDB config directory"; exit 1; }
+    mkdir -p "${DATA_DIR}/minio" || { echo "❌ Failed to create MinIO directory"; exit 1; }
+    echo "✅ Data directories created successfully"
+    echo
 
-# Set ownership to match the user ID of the container process
-echo "=========================================="
-echo "🔑 Setting ownership to match mongodb UID and GID"
-echo "=========================================="
-sudo chown -R 999:999 ${DATA_DIR}/mongodb || { echo "❌ Failed to set ownership for MongoDB"; exit 1; }
-echo "✅ mongodb Ownership set successfully"
-echo
-echo "=========================================="
-echo "🔑 Setting ownership to match minio UID and GID"
-echo "=========================================="
-sudo chown -R 1000:1000 ${DATA_DIR}/minio || { echo "❌ Failed to set ownership for MinIO"; exit 1; }
-echo "✅ minio Ownership set successfully"
-echo
+    # Set ownership to match the user ID of the container process
+    echo "=========================================="
+    echo "🔑 Setting ownership to match mongodb UID and GID"
+    echo "=========================================="
+    sudo chown -R 999:999 ${DATA_DIR}/mongodb || { echo "❌ Failed to set ownership for MongoDB"; exit 1; }
+    echo "✅ mongodb Ownership set successfully"
+    echo
+    echo "=========================================="
+    echo "🔑 Setting ownership to match minio UID and GID"
+    echo "=========================================="
+    sudo chown -R 1000:1000 ${DATA_DIR}/minio || { echo "❌ Failed to set ownership for MinIO"; exit 1; }
+    echo "✅ minio Ownership set successfully"
+    echo
 
-# Set more restrictive permissions for kubs-data directory
-echo "=========================================="
-echo "🔒 Setting permissions for kubes-data directory"
-echo "=========================================="
-sudo chmod -R 777 "${DATA_DIR}" || { echo "❌ Failed to set permissions for kubes-data"; exit 1; }
-echo "✅ Permissions set success: kubes-data directory"
-echo
+    # Set more restrictive permissions for kubs-data directory
+    echo "=========================================="
+    echo "🔒 Setting permissions for kubes-data directory"
+    echo "=========================================="
+    sudo chmod -R 777 "${DATA_DIR}" || { echo "❌ Failed to set permissions for kubes-data"; exit 1; }
+    echo "✅ Permissions set success: kubes-data directory"
+    echo
+fi
 
 # Apply Kubernetes manifests
 echo "=========================================="
