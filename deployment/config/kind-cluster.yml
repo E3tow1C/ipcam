@@ -19,17 +19,17 @@ nodes:
         hostPort: 9001
         protocol: TCP
     extraMounts:
-      - hostPath: /Users/care/kubes-data
+      - hostPath: ${HOME}/kubes-data
         containerPath: /mnt/data
   - role: worker
     extraMounts:
-      - hostPath: /Users/care/kubes-data
+      - hostPath: ${HOME}/kubes-data
         containerPath: /mnt/data
   - role: worker
     extraMounts:
-      - hostPath: /Users/care/kubes-data
+      - hostPath: ${HOME}/kubes-data
         containerPath: /mnt/data
   - role: worker
     extraMounts:
-      - hostPath: /Users/care/kubes-data
+      - hostPath: ${HOME}/kubes-data
         containerPath: /mnt/data
