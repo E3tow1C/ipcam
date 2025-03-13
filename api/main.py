@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.openapi.utils import get_openapi 
+from fastapi.openapi.utils import get_openapi
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from dotenv import load_dotenv
@@ -22,25 +22,9 @@ import cv2
 import io
 import uuid
 
-class JWTMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        if request.url.path not in ["/token", "/openapi.json", "/docs", "/", "/refresh"] and not request.url.path.startswith("/storage/images"):
-            token = request.headers.get("Authorization")
-            if token is None or not token.startswith("Bearer "):
-                return JSONResponse(status_code=401, content={"detail": "Not authenticated"})
-            try:
-                token = token.split(" ")[1]
-                payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-                request.state.user = payload.get("sub")
-            except JWTError:
-                return JSONResponse(status_code=401, content={"detail": "Invalid token"})
-        response = await call_next(request)
-        return response
-
-# Load environment variables from .env file
 load_dotenv(dotenv_path=".api.env")
 
-# JWT configuration
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
@@ -60,16 +44,45 @@ MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 FIRST_USER = os.getenv("FIRST_USER")
 FIRST_USER_PASSWORD = os.getenv("FIRST_USER_PASSWORD")
 
+
+class JWTMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path not in [
+            "/token",
+            "/openapi.json",
+            "/docs",
+            "/",
+            "/refresh",
+        ] and not request.url.path.startswith("/storage/images"):
+            token = request.headers.get("Authorization")
+            if token is None or not token.startswith("Bearer "):
+                return JSONResponse(
+                    status_code=401, content={"detail": "Not authenticated"}
+                )
+            try:
+                token = token.split(" ")[1]
+                payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+                request.state.user = payload.get("sub")
+            except JWTError:
+                return JSONResponse(
+                    status_code=401, content={"detail": "Invalid token"}
+                )
+        response = await call_next(request)
+        return response
+
+
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 # User model
 class User(BaseModel):
     username: str
     password: str
+
 
 app = FastAPI(
     title="IP Camera API",
@@ -87,6 +100,7 @@ app.add_middleware(
 )
 
 app.add_middleware(JWTMiddleware)
+
 
 # Add security definitions to OpenAPI schema
 def custom_openapi():
@@ -116,6 +130,7 @@ def custom_openapi():
 
     app.openapi_schema = openapi_schema
     return app.openapi_schema
+
 
 app.openapi = custom_openapi
 
@@ -153,9 +168,9 @@ rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.now() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -164,9 +179,9 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 def create_refresh_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = datetime.now() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -365,7 +380,6 @@ def delete_image(image_id: str):
         500: {"description": "Internal server error"},
     },
 )
-
 def delete_all_images():
     try:
         records = images_collection.find({})
@@ -381,16 +395,19 @@ def delete_all_images():
             status_code=500, detail=f"Delete all images failed: {str(e)}"
         )
 
+
 @app.get("/capture")
 def capture_image():
     image_url = capture_and_save_image()
     return {"status": "completed", "image_url": image_url}
+
 
 @app.get("/images")
 def get_images():
     records = images_collection.find({})
     all_image_urls = [record["image_url"] for record in records]
     return {"all_image_urls": all_image_urls}
+
 
 @app.get("/storage/images/{object_name}")
 async def get_image(object_name: str):
@@ -420,6 +437,7 @@ async def get_image(object_name: str):
             status_code=404,
             detail=f"Image not found or error accessing image: {str(e)}",
         )
+
 
 @app.get("/cameras")
 def get_cameras():
