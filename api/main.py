@@ -1,16 +1,18 @@
 import os
 from bson import ObjectId
-from fastapi import FastAPI, HTTPException, UploadFile, File, Depends
+from fastapi import FastAPI, HTTPException, UploadFile, File, Depends, Request
 from datetime import datetime, timedelta
 from minio import Minio
 from pymongo import MongoClient
 from pydantic import BaseModel
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.openapi.utils import get_openapi 
+from starlette.middleware.base import BaseHTTPMiddleware
 
+from dotenv import load_dotenv
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pathlib import Path
@@ -20,11 +22,35 @@ import cv2
 import io
 import uuid
 
+class JWTMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path not in ["/token", "/openapi.json", "/docs", "/", "/refresh"]:
+            token = request.headers.get("Authorization")
+            if token is None or not token.startswith("Bearer "):
+                return JSONResponse(status_code=401, content={"detail": "Not authenticated"})
+            try:
+                token = token.split(" ")[1]
+                payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+                request.state.user = payload.get("sub")
+            except JWTError:
+                return JSONResponse(status_code=401, content={"detail": "Invalid token"})
+        response = await call_next(request)
+        return response
+
+# Load environment variables from .env file
+load_dotenv(dotenv_path=".api.env")
+
 # JWT configuration
-SECRET_KEY = "WISANU$SO$HANDSOME"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS"))
+
+# MongoDB connection
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+MINIO_HOST = os.getenv("MINIO_HOST")
+MONGO_URL = os.getenv("MONGO_URL")
+API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL")
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -32,18 +58,10 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-
 # User model
 class User(BaseModel):
     username: str
     password: str
-
-
-# MongoDB connection
-BUCKET_NAME = "images"
-MINIO_HOST = os.getenv("MINIO_HOST", "minio:9000")
-MONGO_URL = os.getenv("MONGO_URL", "mongodb://root:password@mongodb:27017/")
-API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL", "http://fastapi.localhost:8080")
 
 app = FastAPI(
     title="IP Camera API",
@@ -52,6 +70,15 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(JWTMiddleware)
 
 # Add security definitions to OpenAPI schema
 def custom_openapi():
@@ -83,14 +110,6 @@ def custom_openapi():
     return app.openapi_schema
 
 app.openapi = custom_openapi
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 mongo_client = MongoClient(MONGO_URL)
 db = mongo_client["camera_db"]
@@ -244,7 +263,7 @@ async def protected_route(current_user: User = Depends(get_current_user)):
 
 
 @app.get("/")
-def read_root(current_user: User = Depends(get_current_user)):
+def read_root():
     return {"Hello": "World init project | version 1.2 test update with rolling update"}
 
 
@@ -338,6 +357,7 @@ def delete_image(image_id: str):
         500: {"description": "Internal server error"},
     },
 )
+
 def delete_all_images():
     try:
         records = images_collection.find({})
@@ -353,19 +373,16 @@ def delete_all_images():
             status_code=500, detail=f"Delete all images failed: {str(e)}"
         )
 
-
 @app.get("/capture")
 def capture_image():
     image_url = capture_and_save_image()
     return {"status": "completed", "image_url": image_url}
-
 
 @app.get("/images")
 def get_images():
     records = images_collection.find({})
     all_image_urls = [record["image_url"] for record in records]
     return {"all_image_urls": all_image_urls}
-
 
 @app.get("/storage/images/{object_name}")
 async def get_image(object_name: str):
@@ -395,7 +412,6 @@ async def get_image(object_name: str):
             status_code=404,
             detail=f"Image not found or error accessing image: {str(e)}",
         )
-
 
 @app.get("/cameras")
 def get_cameras():

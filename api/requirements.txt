@@ -8,3 +8,6 @@ python-multipart
 pydantic
 python-jose
 passlib[bcrypt]
+python-dotenv
+starlette
+
