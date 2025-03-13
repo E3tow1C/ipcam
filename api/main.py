@@ -50,11 +50,11 @@ rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if request.url.path not in [
-            "/openapi.json",
-            "/docs",
             "/",
-            "/refresh",
             "/auth/login",
+            "/docs",
+            "/openapi.json",
+            "/refresh",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
 
@@ -70,7 +70,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
 
             try:
                 payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-                request.state.user = payload.get("sub")
+                request.state.username = payload.get("sub")
             except JWTError:
                 return JSONResponse(
                     status_code=401, content={"detail": "Invalid token"}
@@ -81,7 +81,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
 
 
 # Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
