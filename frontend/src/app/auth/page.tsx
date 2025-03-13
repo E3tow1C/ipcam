@@ -14,8 +14,6 @@ function Page() {
     const [error, setError] = useState<string>("");
     const router = useRouter();
 
-    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
-
     const handleLogin = async () => {
         setIsLoading(true);
         setError("");
@@ -29,12 +27,10 @@ function Page() {
             const response: loginResponse = await authLogin(userCredential);
 
             if (response.success) {
-                await delay(3000);
                 router.push("/");
             }
             
             if (!response.success && response.message) {
-                await delay(3000);
                 setError(response.message);
             }
            
@@ -91,7 +87,7 @@ function Page() {
                                     <FontAwesomeIcon icon={isLoading ? faCircleNotch : faCheck} spin={isLoading} className="mr-2 h-4" />
                                     Login
                                 </button>
-                                {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+                                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                             </form>
                         </div>
                     </div>
