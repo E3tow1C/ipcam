@@ -46,10 +46,10 @@ FIRST_USER_PASSWORD = os.getenv("FIRST_USER_PASSWORD")
 
 rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
+
 class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if request.url.path not in [
-            "/token",
             "/openapi.json",
             "/docs",
             "/",
@@ -57,18 +57,25 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/auth/login",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
-            if token is None or not token.startswith("Bearer "):
+
+            if token and token.startswith("Bearer "):
+                token = token.split(" ")[1]
+            else:
+                token = request.cookies.get("access_token")
+
+            if not token:
                 return JSONResponse(
                     status_code=401, content={"detail": "Not authenticated"}
                 )
+
             try:
-                token = token.split(" ")[1]
                 payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 request.state.user = payload.get("sub")
             except JWTError:
                 return JSONResponse(
                     status_code=401, content={"detail": "Invalid token"}
                 )
+
         response = await call_next(request)
         return response
 
@@ -95,7 +102,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["localhost:3000"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -219,28 +226,39 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-@app.post("/token", response_model=dict)
+@app.post("/auth/login", response_model=dict)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=401,
-            detail="Incorrect username or password",
+            detail="Incorrect Username or Password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+
     access_token = create_access_token(
         data={"sub": user["username"]}, expires_delta=access_token_expires
     )
+
     refresh_token = create_refresh_token(
         data={"sub": user["username"]}, expires_delta=refresh_token_expires
     )
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "token_type": "bearer",
-    }
+
+    response = JSONResponse(
+        content={"access_token": access_token, "refresh_token": refresh_token}
+    )
+
+    response.set_cookie(
+        key="refresh_token", value=refresh_token, httponly=True, path="/", secure=True
+    )
+    response.set_cookie(
+        key="access_token", value=access_token, httponly=True, path="/", secure=True
+    )
+
+    return response
 
 
 class RefreshTokenRequest(BaseModel):
@@ -491,35 +509,6 @@ def delete_camera(camera_id: str):
     else:
         raise HTTPException(status_code=404, detail="Camera not found")
 
-@app.post("/auth/login", 
-          summary="Login",
-          description="Login to the system",
-          responses={
-              200: {"description": "Login successful"},
-              401: {"description": "Incorrect username or password"},
-              500: {"description": "Internal server error"},
-          },
-)
-def login(user: User):
-    user = authenticate_user(user.username, user.password)
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    access_token = create_access_token(
-        data={"sub": user["username"]}, expires_delta=access_token_expires
-    )
-    refresh_token = create_refresh_token(
-        data={"sub": user["username"]}, expires_delta=refresh_token_expires
-    )
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-    }
 
 class CameraCreate(BaseModel):
     name: str
@@ -660,4 +649,4 @@ def capture_and_save_image():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, log_level="debug")
