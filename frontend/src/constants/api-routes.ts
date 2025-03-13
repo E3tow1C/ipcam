@@ -19,5 +19,7 @@ export const API_ROUTES = {
   AUTH: {
     LOGIN: `${BASE_API_URL}/auth/login`,
     LOGOUT: `${BASE_API_URL}/auth/logout`,
+    REFRESH: `${BASE_API_URL}/auth/refresh`,
+    VALIDATE: `${BASE_API_URL}/auth/validate`,
   },
 };
