@@ -253,28 +253,27 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
 
     response.set_cookie(
-        key="refresh_token", value=refresh_token, httponly=True, path="/", secure=True
-    )
-    response.set_cookie(
         key="access_token", value=access_token, httponly=True, path="/", secure=True
+    )
+
+    response.set_cookie(
+        key="refresh_token", value=refresh_token, httponly=True, path="/", secure=True
     )
 
     return response
 
 
-class RefreshTokenRequest(BaseModel):
-    refresh_token: str
-
-
-@app.post("/auth/refresh", response_model=dict)
-async def refresh_access_token(request: RefreshTokenRequest):
+@app.get("/auth/refresh", response_model=dict)
+async def refresh_access_token(request: Request):
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(request.refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        refresh_token = request.cookies.get("refresh_token")
+
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
@@ -285,7 +284,7 @@ async def refresh_access_token(request: RefreshTokenRequest):
         raise credentials_exception
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    access_token = create_access_token(
+    new_access_token = create_access_token(
         data={"sub": user["username"]}, expires_delta=access_token_expires
     )
     new_refresh_token = create_refresh_token(
@@ -293,14 +292,19 @@ async def refresh_access_token(request: RefreshTokenRequest):
     )
 
     response = JSONResponse(
-        content={"access_token": access_token, "refresh_token": new_refresh_token}
+        content={"access_token": new_access_token, "refresh_token": new_refresh_token}
     )
 
     response.set_cookie(
-        key="refresh_token", value=new_refresh_token, httponly=True, path="/", secure=True
+        key="access_token", value=new_access_token, httponly=True, path="/", secure=True
     )
+
     response.set_cookie(
-        key="access_token", value=access_token, httponly=True, path="/", secure=True
+        key="refresh_token",
+        value=new_refresh_token,
+        httponly=True,
+        path="/",
+        secure=True,
     )
 
     return response
@@ -333,7 +337,6 @@ async def validate_token(request: Request):
     except Exception as e:
         return {
             "success": False,
-            "isVerified": False,
             "message": f"Error validating token: {str(e)}",
         }
 
