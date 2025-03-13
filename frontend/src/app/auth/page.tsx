@@ -1,11 +1,62 @@
-import Sidebar from '@/components/SideBar'
-import { faAngleLeft, faChartPie, faCheck } from '@fortawesome/free-solid-svg-icons'
+"use client";
+
+import { authLogin, loginResponse, userCredential } from '@/services/apis';
+import { faChartPie, faCheck, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Link from 'next/link'
-import React from 'react'
+import { useRouter } from 'next/navigation';
+import{ useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 
-function page() {
+function Page() {
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [error, setError] = useState<string>("");
+    const router = useRouter();
+
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+    const handleLogin = async () => {
+        setIsLoading(true);
+        setError("");
+
+        try {
+            const userCredential: userCredential = {
+                username: username,
+                password: password,
+            };
+
+            const response: loginResponse = await authLogin(userCredential);
+
+            if (response.success) {
+                await delay(3000);
+                router.push("/");
+            }
+            
+            if (!response.success && response.message) {
+                await delay(3000);
+                setError(response.message);
+            }
+           
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError(String(error));
+            }
+        }
+
+        setIsLoading(false);
+    };
+
+    const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setUsername(event.target.value);
+    };
+
+    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(event.target.value);
+    };
+
     return (
         <div className="h-screen flex flex-col">
             <Toaster />
@@ -30,16 +81,17 @@ function page() {
                                 <h1 className="text-xl text-gray-700 font-bold ml-1 mb-6">Login</h1>
                                 <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Username</label>
                                 <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    id="username" type="text" />
+                                    id="username" type="text" onChange={handleUsernameChange} />
 
                                 <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="password">Password</label>
                                 <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    id="password" type="password" />
+                                    id="password" type="password" onChange={handlePasswordChange}/>
 
-                                <button className="bg-blue-500 text-white w-full mt-6 px-3 py-2 flex items-center justify-center rounded-md hover:bg-blue-600 transition-all disabled:opacity-70">
-                                    <FontAwesomeIcon icon={faCheck} className="mr-2 h-4" />
+                                <button className={`${isLoading ? "bg-blue-600" : "bg-blue-500"} text-white w-full mt-6 px-3 py-2 flex items-center justify-center rounded-md hover:bg-blue-600 transition-all disabled:opacity-70`} disabled={isLoading} onClick={handleLogin}>
+                                    <FontAwesomeIcon icon={isLoading ? faCircleNotch : faCheck} spin={isLoading} className="mr-2 h-4" />
                                     Login
                                 </button>
+                                {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
                             </form>
                         </div>
                     </div>
@@ -49,4 +101,4 @@ function page() {
     )
 }
 
-export default page
+export default Page
