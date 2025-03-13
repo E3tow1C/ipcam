@@ -3,6 +3,8 @@ import Sidebar from "@/components/SideBar";
 import { getAllCameras } from "@/services/apis";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 export default async function Home() {
   // Get cameras
@@ -18,6 +20,10 @@ export default async function Home() {
             <h1 className="text-2xl ml-8 md:ml-0 font-bold text-gray-700 flex items-center">
               IP Camera
             </h1>
+            <Link className="px-4 py-2 bg-white text-gray-700 rounded-md cursor-pointer hover:bg-gray-200 transition-all" href={"/ipcam/new"}>
+              <FontAwesomeIcon icon={faPlus} className="mr-2" />
+              Add Camera
+            </Link>
           </nav>
           <div className="w-[90%] mx-auto mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
