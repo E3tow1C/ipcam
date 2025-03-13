@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { captureCameraImage } from "@/services/apis";
-import { faCircleNotch, faCameraAlt, faPenAlt, faPen, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCircleNotch, faCameraAlt, faPen, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -16,6 +16,7 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
     const [isCapturing, setIsCapturing] = useState(false);
     const [images, setImages] = useState<string[]>([]);
     const [isConfiguring, setIsConfiguring] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [message, setMessage] = useState<string>('');
     const [isAuth, setIsAuth] = useState<boolean>(false);
     const [formData, setFormData] = useState({
@@ -91,7 +92,8 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                         password: '',
                                         authType: 'basic'
                                     });
-                                    isAuth && setIsAuth(false);
+
+                                    if (isAuth) setIsAuth(false);
                                 }
                             }}
                         >
