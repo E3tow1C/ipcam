@@ -1,8 +1,9 @@
 'use client'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faChartPie, faImage, faUpload, faVideoCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faChartPie, faImage, faKey, faUpload, faUserAlt, faVideoCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
 import MenuItem from "./MenuItem";
 import { useState } from "react";
+import UserCard from "./UserCard";
 
 const Sidebar: React.FC = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -11,7 +12,7 @@ const Sidebar: React.FC = () => {
     <>
       <aside 
         className={`fixed top-0 left-0 z-50 h-full bg-gray-100 p-6 transition-all duration-300 animate-slide-in-left
-        ${isSidebarVisible ? "max-w-[400px] w-full block" : "w-0 hidden"} 
+        ${isSidebarVisible ? "max-w-[400px] w-full flex flex-col justify-between" : "w-0 hidden"} 
         md:hidden`} 
       >
         <div className="flex items-center gap-2">
@@ -33,12 +34,9 @@ const Sidebar: React.FC = () => {
 
         </div>
         <div className="mt-9 flex flex-col gap-1">
-          <MenuItem href="/" icon={faChartPie} label="Dashboard" />
-          <MenuItem href="/images" icon={faImage} label="Images" />
-          <div className="w-[90%] mx-auto my-3 h-[1px] bg-gray-200"></div>
-          <MenuItem href="/upload" icon={faUpload} label="Upload" />
-          <MenuItem href="/ipcam" icon={faVideoCamera} label="IP Camera" />
+          <MunuItems />
         </div>
+        <UserCard />
       </aside>
 
       <button 
@@ -48,7 +46,7 @@ const Sidebar: React.FC = () => {
         <FontAwesomeIcon icon={faBars} className="w-6 h-6" />
       </button>
 
-      <aside className="hidden md:block w-[300px] bg-gray-100 p-6">
+      <aside className="hidden md:flex w-[300px] bg-gray-100 p-6 h-full flex-col justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faChartPie} className="w-11 h-11 text-blue-600" />
           <div className="flex flex-col gap-1">
@@ -61,15 +59,26 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
         <div className="mt-9 flex flex-col gap-1">
-          <MenuItem href="/" icon={faChartPie} label="Dashboard" />
-          <MenuItem href="/images" icon={faImage} label="Images" />
-          <div className="w-[90%] mx-auto my-3 h-[1px] bg-gray-200"></div>
-          <MenuItem href="/upload" icon={faUpload} label="Upload" />
-          <MenuItem href="/ipcam" icon={faVideoCamera} label="IP Camera" />
+          <MunuItems />
         </div>
+        <UserCard />
       </aside>
     </>
   );
 };
 
 export default Sidebar;
+
+function MunuItems() {
+  return (
+    <>
+      <MenuItem href="/" icon={faChartPie} label="Dashboard" />
+      <MenuItem href="/images" icon={faImage} label="Gallery" />
+      <MenuItem href="/upload" icon={faUpload} label="Upload" />
+      <MenuItem href="/ipcam" icon={faVideoCamera} label="IP Camera" />
+      <div className="w-[90%] mx-auto my-3 h-[1px] bg-gray-200"></div>
+      <MenuItem href="/Accounts" icon={faUserAlt} label="Accounts" />
+      <MenuItem href="/Credentials" icon={faKey} label="Credentials" />
+    </>
+  )
+}
