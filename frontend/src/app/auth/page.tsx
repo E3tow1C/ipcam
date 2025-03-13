@@ -4,10 +4,10 @@ import { authLogin, loginResponse, userCredential } from '@/services/apis';
 import { faChartPie, faCheck, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useRouter, useSearchParams } from 'next/navigation';
-import{ useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 
-function Page() {
+function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectPath = searchParams.get("redirect") || "/";
@@ -31,11 +31,11 @@ function Page() {
             if (response.success) {
                 router.replace(redirectPath);
             }
-            
+
             if (!response.success && response.message) {
                 setError(response.message);
             }
-           
+
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message);
@@ -56,6 +56,27 @@ function Page() {
     };
 
     return (
+        <form className="w-[90%] mx-auto">
+            <h1 className="text-xl text-gray-700 font-bold ml-1 mb-6">Login</h1>
+            <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Username</label>
+            <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="username" type="text" onChange={handleUsernameChange} />
+
+            <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="password">Password</label>
+            <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="password" type="password" onChange={handlePasswordChange} />
+
+            <button className={`${isLoading ? "bg-blue-600" : "bg-blue-500"} text-white w-full mt-6 px-3 py-2 flex items-center justify-center rounded-md hover:bg-blue-600 transition-all disabled:opacity-70`} disabled={isLoading} onClick={handleLogin}>
+                <FontAwesomeIcon icon={isLoading ? faCircleNotch : faCheck} spin={isLoading} className="mr-2 h-4" />
+                Login
+            </button>
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        </form>
+    )
+}
+
+function Page() {
+    return (
         <div className="h-screen flex flex-col">
             <Toaster />
             <div className="flex flex-1">
@@ -75,22 +96,9 @@ function Page() {
                     </nav>
                     <div className="absolute left-0 right-0 top-44">
                         <div className="bg-white rounded-xl border w-[90%] max-w-[600px] py-10 mx-auto flex items-center justify-center text-white text-start">
-                            <form className="w-[90%] mx-auto">
-                                <h1 className="text-xl text-gray-700 font-bold ml-1 mb-6">Login</h1>
-                                <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Username</label>
-                                <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    id="username" type="text" onChange={handleUsernameChange} />
-
-                                <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="password">Password</label>
-                                <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    id="password" type="password" onChange={handlePasswordChange}/>
-
-                                <button className={`${isLoading ? "bg-blue-600" : "bg-blue-500"} text-white w-full mt-6 px-3 py-2 flex items-center justify-center rounded-md hover:bg-blue-600 transition-all disabled:opacity-70`} disabled={isLoading} onClick={handleLogin}>
-                                    <FontAwesomeIcon icon={isLoading ? faCircleNotch : faCheck} spin={isLoading} className="mr-2 h-4" />
-                                    Login
-                                </button>
-                                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-                            </form>
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <LoginForm />
+                            </Suspense>
                         </div>
                     </div>
                 </div>
