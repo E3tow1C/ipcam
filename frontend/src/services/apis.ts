@@ -145,8 +145,9 @@ export const authLogin = async (userCredential: userCredential): Promise<loginRe
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: formData
     });
-    
+
     const responseData = await response.json();
+
     if (response.ok) {
       const data: loginResponse = {
         success: true,
@@ -164,14 +165,12 @@ export const authLogin = async (userCredential: userCredential): Promise<loginRe
       return data;
     }
 
-    console.log("reposne from login: ", response);
-
     return {
       success: false,
       message: "Something went wrong",
     };
 
-  } catch (e) {
-    throw e;
+  } catch (error) {
+    throw error;
   }
 }
