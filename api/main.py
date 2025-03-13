@@ -24,7 +24,7 @@ import uuid
 
 class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path not in ["/token", "/openapi.json", "/docs", "/", "/refresh"]:
+        if request.url.path not in ["/token", "/openapi.json", "/docs", "/", "/refresh"] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
             if token is None or not token.startswith("Bearer "):
                 return JSONResponse(status_code=401, content={"detail": "Not authenticated"})
@@ -48,9 +48,15 @@ REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS"))
 
 # MongoDB connection
 BUCKET_NAME = os.getenv("BUCKET_NAME")
-MINIO_HOST = os.getenv("MINIO_HOST")
 MONGO_URL = os.getenv("MONGO_URL")
 API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL")
+
+# MinIO connection
+MINIO_HOST = os.getenv("MINIO_HOST")
+
+# First user
+FIRST_USER = os.getenv("FIRST_USER")
+FIRST_USER_PASSWORD = os.getenv("FIRST_USER_PASSWORD")
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -119,11 +125,11 @@ auth_collection = db["auth"]
 user_collection = db["users"]
 
 # Initialize the auth collection with a test user
-if user_collection.count_documents({"username": "testuser"}) == 0:
+if user_collection.count_documents({"username": FIRST_USER}) == 0:
     user_collection.insert_one(
         {
-            "username": "testuser",
-            "password": pwd_context.hash("testpassword"),
+            "username": FIRST_USER,
+            "password": pwd_context.hash(FIRST_USER_PASSWORD),
         }
     )
 
