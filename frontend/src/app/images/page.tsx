@@ -1,11 +1,34 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
+
 import Sidebar from "@/components/SideBar";
 import { getAllImages } from "@/services/apis";
-import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react";
 
-export default async function Home() {
-  const images = await getAllImages();
+export default function Home() {
+  const [images, setImages] = useState<string[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const [errMsg, setErrMsg] = useState<string>("");
+  const [isError, setIsError] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const images = await getAllImages();
+        setImages(images);
+        setErrMsg("");
+      } catch (error) {
+        setErrMsg("Failed to fetch images");
+        setIsError(true);
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchImages();
+  }, []);
 
   return (
     <div className="h-screen flex flex-col">
@@ -20,7 +43,7 @@ export default async function Home() {
           <main className="mt-8">
             {images.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {images.reverse().map((img, index) => (
+                {images.reverse().map((img: string, index: number) => (
                   <div key={index} className="overflow-hidden rounded shadow">
                     <img
                       src={img}
@@ -32,8 +55,8 @@ export default async function Home() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-64 border border-dashed border-gray-300 rounded-xl">
-               <FontAwesomeIcon icon={faImage} className="h-16 w-16 text-gray-500" />
-                <p className="text-gray-500">No images available</p>
+               <FontAwesomeIcon icon={isError ? faTriangleExclamation : faImage} className="h-16 w-16 text-gray-500" />
+                <p className="text-gray-500">{isLoading ? "loading images" : (isError ? errMsg : "No images available")}</p>
               </div>
             )}
           </main>
