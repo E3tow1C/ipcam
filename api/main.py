@@ -44,6 +44,7 @@ MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 FIRST_USER = os.getenv("FIRST_USER")
 FIRST_USER_PASSWORD = os.getenv("FIRST_USER_PASSWORD")
 
+rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -160,8 +161,6 @@ minio_client = Minio(
 
 if not minio_client.bucket_exists(BUCKET_NAME):
     minio_client.make_bucket(BUCKET_NAME)
-
-rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 
 # JWT utility functions
