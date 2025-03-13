@@ -1,14 +1,23 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
+
 import Sidebar from "@/components/SideBar";
-import { getAllCameras } from "@/services/apis";
+import { CameraData, getAllCameras } from "@/services/apis";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useState, useEffect } from "react";
 
-export default async function Home() {
-  // Get cameras
-  const cameras = await getAllCameras();
+export default function Home() {
+  const [cameras, setCameras] = useState<CameraData[]>([]);
+  useEffect(() => {
+    async function fetchCameras() {
+      const cameras: CameraData[] = await getAllCameras();
+      setCameras(cameras);
+    }
+    fetchCameras();
+  }, []);
 
   return (
     <div className="h-screen flex flex-col">
@@ -27,28 +36,28 @@ export default async function Home() {
           </nav>
           <div className="w-full mx-auto mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {
-              cameras.map((camera, index) => (
-                <Link key={index} className="bg-gray-50 border rounded-xl hover:bg-gray-100 transition-all p-4" href={`/ipcam/${camera._id}`}>
-                  <div className="bg-gray-800 rounded-xl shadow-xl flex items-center justify-center text-white text-center relative">
-                    <img
-                      src={camera.url}
-                      alt="ipcam"
-                      className="w-full h-56 object-cover rounded-lg"
-                    />
-                    <div className="absolute top-0 left-0 right-0 flex justify-between p-2">
+              {
+                cameras.map((camera, index) => (
+                  <Link key={index} className="bg-gray-50 border rounded-xl hover:bg-gray-100 transition-all p-4" href={`/ipcam/${camera._id}`}>
+                    <div className="bg-gray-800 rounded-xl shadow-xl flex items-center justify-center text-white text-center relative">
+                      <img
+                        src={camera.url}
+                        alt="ipcam"
+                        className="w-full h-56 object-cover rounded-lg"
+                      />
+                      <div className="absolute top-0 left-0 right-0 flex justify-between p-2">
 
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <div className="mt-4">
-                      <h2 className="text-lg font-bold">{camera.name}</h2>
-                      <p className="text-gray-500">{camera.location}</p>
+                    <div>
+                      <div className="mt-4">
+                        <h2 className="text-lg font-bold">{camera.name}</h2>
+                        <p className="text-gray-500">{camera.location}</p>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))
-            }
+                  </Link>
+                ))
+              }
             </div>
           </div>
         </div>
