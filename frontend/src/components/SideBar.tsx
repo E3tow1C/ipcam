@@ -19,7 +19,7 @@ const Sidebar: React.FC = () => {
           <FontAwesomeIcon icon={faChartPie} className="w-11 h-11 text-blue-600" />
           <div className="flex flex-col gap-1">
             <h1 className="text-xl font-bold leading-none text-blue-600 flex items-center">
-              CoE KKU
+              IPCam Manager
             </h1>
             <p className="text-sm text-gray-500 leading-none">
               Access control system
@@ -51,7 +51,7 @@ const Sidebar: React.FC = () => {
           <FontAwesomeIcon icon={faChartPie} className="w-11 h-11 text-blue-600" />
           <div className="flex flex-col gap-1">
             <h1 className="text-xl font-bold leading-none text-blue-600 flex items-center">
-              CoE KKU
+              IPCam Manager
             </h1>
             <p className="text-sm text-gray-500 leading-none">
               Access control system

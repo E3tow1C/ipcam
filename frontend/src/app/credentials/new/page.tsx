@@ -27,16 +27,19 @@ export default async function Home() {
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                     id="name" type="text" placeholder="Name for service" />
 
-                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="url">Service URL</label>
+                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="url">Service URL/IP Address</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                    id="url" type="text" placeholder="Service URL or IP" />
+                    id="url" type="text" placeholder="example: https://example.com" />
+                    <p className="text-xs text-gray-400 ml-1 mt-2">
+                      Note: The URL/IP address will be used to configure Cross-Origin Resource Sharing (CORS) policies for secure API access
+                    </p>
 
-                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="exp">Credentials Expire Date</label>
+                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="exp">Credentials Expiry Date</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="exp" type="date" placeholder="Expiry Date" min={new Date().toISOString().split('T')[0]} />
                     <div className="flex items-center mt-2 ml-1 gap-2">
                       <input type="checkbox" id="no-exp" name="no-exp" value="no-exp" />
-                      <label htmlFor="no-exp" className="text-gray-500"> No Expiry</label>
+                      <label htmlFor="no-exp" className="text-gray-500 select-none"> No Expiry</label>
                     </div>
 
                     <button className="bg-blue-500 text-white w-full mt-6 px-3 py-2 rounded-md hover:bg-blue-600 transition-all disabled:opacity-70">

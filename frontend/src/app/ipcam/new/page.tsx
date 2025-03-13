@@ -9,6 +9,7 @@ import { useState } from "react";
 
 export default function Home() {
     const [message, setMessage] = useState<string>('');
+    const [isAuth, setIsAuth] = useState<boolean>(false);
 
     const handleAddCamera = async () => {
         const name = (document.getElementById('name') as HTMLInputElement).value;
@@ -42,12 +43,12 @@ export default function Home() {
                 <div className="flex-1 relative h-svh overflow-scroll">
                     <nav className="w-full bg-gradient-to-br h-52 from-blue-500 to-blue-400">
                         <h1 className="text-2xl px-12 ml-8 md:ml-0 py-7 md:py-9 font-bold text-white flex items-center">
-                            <Link href={`/ipcam`}><FontAwesomeIcon icon={faAngleLeft} className="h-6 w-6 mr-1" />IP Camera</Link>
+                            <Link href={`/ipcam`}><FontAwesomeIcon icon={faAngleLeft} className="h-6 w-6 mr-1" />IP Cameras</Link>
                             <span className="text-gray-200 ml-2 font-normal"><span>/</span> New Camera</span>
                         </h1>
                     </nav>
                     <div className="absolute left-0 right-0 top-32">
-                        <div className="bg-white rounded-xl border w-[90%] max-w-[800px] py-10 mx-auto flex items-center justify-center text-white text-start">
+                        <div className="bg-white rounded-xl border w-[90%] max-w-[800px] py-10 mx-auto flex mb-10 items-center justify-center text-white text-start">
                             <form className="w-[90%] mx-auto"
                                 onSubmit={(e) => {
                                     e.preventDefault();
@@ -59,13 +60,44 @@ export default function Home() {
                                 <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     id="name" type="text" placeholder="Name for new camera" />
 
-                                <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="cameraUrl">Camera URL</label>
+
+                                <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Location</label>
+                                <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    id="location" type="text" placeholder="Location of camera" />
+
+                                <p className="text-gray-600 font-semibold mt-6">
+                                    Camera Configuration
+                                </p>
+
+                                <label className="block text-gray-500 text-sm mb-1 mt-2 ml-1" htmlFor="cameraUrl">Camera URL</label>
                                 <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     id="cameraUrl" type="text" placeholder="Camera URL or IP" />
 
-                                <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Location</label>
-                                <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-6"
-                                    id="location" type="text" placeholder="Location of camera" />
+                                <div className="flex items-center mt-4 ml-1 mb-4 gap-2">
+                                    <input type="checkbox" id="auth" name="auth" value="auth" onChange={() => setIsAuth(!isAuth)} checked={isAuth} />
+                                    <label htmlFor="auth" className="text-gray-500 select-none"> Camera Authentication</label>
+                                </div>
+
+                                {
+                                    isAuth && 
+                                    <>
+                                        <label className="block text-gray-500 text-sm mb-1 ml-1" htmlFor="location">Username</label>
+                                        <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            id="username" type="text" placeholder="Camera Username" disabled={!isAuth} />
+                                        
+                                        <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Password</label>
+                                        <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            id="password" type="password" placeholder="Camera Password" disabled={!isAuth} />
+
+                                        <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Auth Type</label>
+                                        <select className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-6"
+                                            id="authType" disabled={!isAuth}
+                                        >
+                                            <option value="basic">Basic</option>
+                                            <option value="digest">Digest</option>
+                                        </select>
+                                    </>
+                                }
 
                                 <p className="text-red-500 text-sm mb-2">{message}</p>
                                 <button className="bg-blue-500 text-white w-full px-3 py-2 rounded-md hover:bg-blue-600 transition-all disabled:opacity-70">

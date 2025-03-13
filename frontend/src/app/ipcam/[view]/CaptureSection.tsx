@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { captureCameraImage } from "@/services/apis";
-import { faCircleNotch, faCameraAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCircleNotch, faCameraAlt, faPenAlt, faPen, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -9,11 +9,31 @@ import toast from "react-hot-toast";
 interface Camera {
     name: string;
     url: string;
+    location: string;
 }
 
 export default function CaptureSection({ camera, cameraId }: { camera: Camera; cameraId: string }) {
     const [isCapturing, setIsCapturing] = useState(false);
     const [images, setImages] = useState<string[]>([]);
+    const [isConfiguring, setIsConfiguring] = useState(false);
+    const [message, setMessage] = useState<string>('');
+    const [isAuth, setIsAuth] = useState<boolean>(false);
+    const [formData, setFormData] = useState({
+        name: camera.name,
+        location: camera.location,
+        url: camera.url,
+        username: '',
+        password: '',
+        authType: 'basic'
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [id]: value
+        }));
+    };
 
     const handleCapture = async () => {
         if (isCapturing) return;
@@ -41,32 +61,163 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
             <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
                 <div className="flex items-center justify-between p-3">
                     <h2 className="text-lg font-bold ml-2">{camera.name}</h2>
-                    <button
-                        className="bg-blue-500 text-white px-3 py-2 rounded-md disabled:opacity-70"
-                        onClick={handleCapture}
-                        disabled={isCapturing}
-                    >
-                        {isCapturing ? (
-                            <FontAwesomeIcon icon={faCircleNotch} className="animate-spin mr-2" />
-                        ) : (
-                            <FontAwesomeIcon icon={faCameraAlt} className="mr-2" />
-                        )}
-                        Take Picture
-                    </button>
+                    <div className="flex gap-2">
+                        {
+                            !isConfiguring && (
+                                <button
+                                    className="bg-blue-500 text-white px-3 py-2 rounded-md disabled:opacity-70"
+                                    onClick={handleCapture}
+                                    disabled={isCapturing}
+                                >
+                                    {isCapturing ? (
+                                        <FontAwesomeIcon icon={faCircleNotch} className="animate-spin mr-2" />
+                                    ) : (
+                                        <FontAwesomeIcon icon={faCameraAlt} className="mr-2" />
+                                    )}
+                                    Take Picture
+                                </button>
+                            )
+                        }
+                        <button
+                            className="bg-gray-500 text-white px-3 py-2 rounded-md disabled:opacity-70"
+                            onClick={() => {
+                                setIsConfiguring(!isConfiguring)
+                                if (!isConfiguring) {
+                                    setFormData({
+                                        name: camera.name,
+                                        location: camera.location,
+                                        url: camera.url,
+                                        username: '',
+                                        password: '',
+                                        authType: 'basic'
+                                    });
+                                    isAuth && setIsAuth(false);
+                                }
+                            }}
+                        >
+                            {
+                                isConfiguring ? (
+                                    <>
+                                        <FontAwesomeIcon icon={faXmark} className="mr-2" />
+                                        Cancel
+                                    </>
+                                ) : (
+                                    <>
+                                        <FontAwesomeIcon icon={faPen} className="mr-2" />
+                                        Configuration
+                                    </>
+                                )
+                            }
+                        </button>
+                    </div>
                 </div>
+                {
+                    isConfiguring && (
+                        <form className="w-[90%] mx-auto mb-10"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+
+                            }}
+                        >
+                            <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Camera Name</label>
+                            <input
+                                className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="name"
+                                type="text"
+                                placeholder="Name for new camera"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                            />
+
+
+                            <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Location</label>
+                            <input
+                                className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="location"
+                                type="text"
+                                placeholder="Location of camera"
+                                value={formData.location}
+                                onChange={handleInputChange}
+                            />
+                            <p className="text-gray-600 font-semibold mt-6">
+                                Camera Configuration
+                            </p>
+
+                            <label className="block text-gray-500 text-sm mb-1 mt-2 ml-1" htmlFor="cameraUrl">Camera URL</label>
+                            <input
+                                className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="cameraUrl"
+                                type="text"
+                                placeholder="Camera URL or IP"
+                                value={formData.url}
+                                onChange={handleInputChange}
+                            />
+
+                            <div className="flex items-center mt-4 ml-1 mb-4 gap-2">
+                                <input type="checkbox" id="auth" name="auth" value="auth" onChange={() => setIsAuth(!isAuth)} checked={isAuth} />
+                                <label htmlFor="auth" className="text-gray-500 select-none"> Camera Authentication</label>
+                            </div>
+
+                            {
+                                isAuth &&
+                                <>
+                                    <label className="block text-gray-500 text-sm mb-1 ml-1" htmlFor="location">Username</label>
+                                    <input
+                                        className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        id="username"
+                                        type="text"
+                                        placeholder="Camera Username"
+                                        value={formData.username}
+                                        onChange={handleInputChange}
+                                        disabled={!isAuth}
+                                    />
+
+                                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Password</label>
+                                    <input
+                                        className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        id="password"
+                                        type="password"
+                                        placeholder="Camera Password"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        disabled={!isAuth}
+                                    />
+
+                                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Auth Type</label>
+                                    <select
+                                        className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-6"
+                                        id="authType"
+                                        value={formData.authType}
+                                        onChange={handleInputChange}
+                                        disabled={!isAuth}
+                                    >
+                                        <option value="basic">Basic</option>
+                                        <option value="digest">Digest</option>
+                                    </select>
+                                </>
+                            }
+
+                            <p className="text-red-500 text-sm mb-2">{message}</p>
+                            <button className="bg-blue-500 text-white w-full px-3 py-2 rounded-md hover:bg-blue-600 transition-all disabled:opacity-70">
+                                <FontAwesomeIcon icon={faCheck} className="mr-2 h-3" />
+                                Done
+                            </button>
+                        </form>
+                    )
+                }
             </div>
             <div className="w-[90%] max-w-[800px] mx-auto my-5 bg-white z-10">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {images.reverse().map((image, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={image}
-                      alt="captured-image"
-                      className="object-cover border rounded-xl animate-slide-up"
-                    />
-                  </div>
-                ))}
-              </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {images.reverse().map((image, index) => (
+                        <div key={index} className="relative">
+                            <img
+                                src={image}
+                                alt="captured-image"
+                                className="object-cover border rounded-xl animate-slide-up"
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
         </>
     );
