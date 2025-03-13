@@ -519,6 +519,9 @@ def get_cameras():
 
 @app.get("/camera/{camera_id}")
 def get_camera(camera_id: str):
+    if len(camera_id) != 24:
+        raise HTTPException(status_code=404, detail="Camera not found")
+
     record = camera_collection.find_one({"_id": ObjectId(camera_id)})
     if record:
         camera = record
