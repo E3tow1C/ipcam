@@ -17,8 +17,10 @@ export async function middleware(request: NextRequest) {
   if (isPublicPath && accessToken) {
     try {
       const validateResponse = await fetch(API_ROUTES.AUTH.VALIDATE, {
-        method: "GET",
         credentials: "include",
+        headers: {
+          Cookie: `access_token=${accessToken}; refresh_token=${refreshToken}`
+        }
       });
 
       const validateData: authValidateResponse = await validateResponse.json();
@@ -26,7 +28,7 @@ export async function middleware(request: NextRequest) {
       if (validateData.success) {
         return NextResponse.redirect(new URL('/', request.url));
       }
-    } catch {}
+    } catch { }
   }
 
   if (!isPublicPath && !accessToken && !refreshToken) {
@@ -39,7 +41,6 @@ export async function middleware(request: NextRequest) {
   if (!isPublicPath && accessToken) {
     try {
       const validateResponse = await fetch(API_ROUTES.AUTH.VALIDATE, {
-        method: 'GET',
         credentials: 'include',
         headers: {
           Cookie: `access_token=${accessToken}; refresh_token=${refreshToken}`
@@ -54,7 +55,6 @@ export async function middleware(request: NextRequest) {
 
       if (refreshToken) {
         const refreshResponse = await fetch(API_ROUTES.AUTH.REFRESH, {
-          method: 'POST',
           headers: {
             Cookie: `access_token=${accessToken}; refresh_token=${refreshToken}`
           },
