@@ -15,9 +15,9 @@ nodes:
       - containerPort: 443
         hostPort: 443
         protocol: TCP
-      - containerPort: 9001
-        hostPort: 9001
-        protocol: TCP
+      # - containerPort: 9001
+      #   hostPort: 9001
+      #   protocol: TCP
     extraMounts:
       - hostPath: ${HOME}/kubes-data
         containerPath: /mnt/data
