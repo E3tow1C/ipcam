@@ -1,9 +1,8 @@
 import Sidebar from "@/components/SideBar";
-import { getAllCameras } from "@/services/apis";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faArrowLeft, faCheck, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faAngleLeft, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 export default async function Home() {
 
