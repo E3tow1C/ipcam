@@ -1,4 +1,5 @@
 import { API_ROUTES } from '../constants/api-routes';
+import Cookies from 'js-cookie';
 
 type RequestBody = Record<string, unknown> | FormData | null;
 
@@ -76,6 +77,9 @@ export type CameraData = {
   name: string;
   url: string;
   location: string;
+  username?: string;
+  password?: string;
+  authType?: "basic" | "digest";
 };
 
 export const getAllCameras = async (): Promise<CameraData[]> => {
@@ -96,9 +100,10 @@ export const getCamerasByLocation = async (location: string): Promise<CameraData
   }
 }
 
-export const addCamera = async (name: string, url: string, location: string): Promise<CameraData> => {
+export const addCamera = async (name: string, url: string, location: string, username?: string, password?: string, authType?: string): Promise<CameraData> => {
   try {
-    const response = await fetchAPI(API_ROUTES.CAMERA.POST, 'POST', { name, url, location });
+    const accessToken = Cookies.get('access_token');
+    const response = await fetchAPI(API_ROUTES.CAMERA.POST, 'POST', { name, url, location, username, password, authType }, accessToken);
     return response.camera;
   }
   catch (error) {
