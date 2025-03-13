@@ -1,6 +1,6 @@
 import os
 from bson import ObjectId
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Depends
 from datetime import datetime, timedelta
 from minio import Minio
 from pymongo import MongoClient
@@ -8,6 +8,11 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.openapi.utils import get_openapi 
+
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 from pathlib import Path
 
 import uvicorn
@@ -15,12 +20,69 @@ import cv2
 import io
 import uuid
 
+# JWT configuration
+SECRET_KEY = "WISANU$SO$HANDSOME"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+
+# Password hashing context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# OAuth2 scheme
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+# User model
+class User(BaseModel):
+    username: str
+    password: str
+
+
+# MongoDB connection
 BUCKET_NAME = "images"
 MINIO_HOST = os.getenv("MINIO_HOST", "minio:9000")
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://root:password@mongodb:27017/")
 API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL", "http://fastapi.localhost:8080")
 
-app = FastAPI()
+app = FastAPI(
+    title="IP Camera API",
+    description="API for IP Camera management system",
+    version="1.0.0",
+    openapi_url="/openapi.json",
+)
+
+
+# Add security definitions to OpenAPI schema
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description=app.description,
+        routes=app.routes,
+    )
+
+    # Add JWT bearer security scheme
+    openapi_schema["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
+    }
+
+    # Apply security globally to all operations
+    for path in openapi_schema["paths"].values():
+        for operation in path.values():
+            operation["security"] = [{"BearerAuth": []}]
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,6 +92,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+mongo_client = MongoClient(MONGO_URL)
+db = mongo_client["camera_db"]
+images_collection = db["images"]
+camera_collection = db["cameras"]
+auth_collection = db["auth"]
+user_collection = db["users"]
+
+# Initialize the auth collection with a test user
+if user_collection.count_documents({"username": "testuser"}) == 0:
+    user_collection.insert_one(
+        {
+            "username": "testuser",
+            "password": pwd_context.hash("testpassword"),
+        }
+    )
 
 minio_client = Minio(
     MINIO_HOST,
@@ -39,31 +116,135 @@ minio_client = Minio(
     secure=False,
 )
 
-
 if not minio_client.bucket_exists(BUCKET_NAME):
     minio_client.make_bucket(BUCKET_NAME)
-
-mongo_client = MongoClient(MONGO_URL)
-db = mongo_client["camera_db"]
-images_collection = db["images"]
-camera_collection = db["cameras"]
-if "images" not in db.list_collection_names():
-    images_collection = db.create_collection("images")
-    print("Database and collection 'images' created.")
-else:
-    images_collection = db["images"]
-
-if "cameras" not in db.list_collection_names():
-    camera_collection = db.create_collection("cameras")
-    print("Database and collection 'cameras' created.")
-else:
-    camera_collection = db["cameras"]
 
 rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 
+# JWT utility functions
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+def create_refresh_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def authenticate_user(username: str, password: str):
+    user = user_collection.find_one({"username": username})
+    if not user:
+        return False
+    if not verify_password(password, user["password"]):
+        return False
+    return user
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    user = user_collection.find_one({"username": username})
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+@app.post("/token", response_model=dict)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    access_token = create_access_token(
+        data={"sub": user["username"]}, expires_delta=access_token_expires
+    )
+    refresh_token = create_refresh_token(
+        data={"sub": user["username"]}, expires_delta=refresh_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+    }
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
+@app.post("/refresh", response_model=dict)
+async def refresh_access_token(request: RefreshTokenRequest):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(request.refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    user = user_collection.find_one({"username": username})
+    if user is None:
+        raise credentials_exception
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    access_token = create_access_token(
+        data={"sub": user["username"]}, expires_delta=access_token_expires
+    )
+    new_refresh_token = create_refresh_token(
+        data={"sub": user["username"]}, expires_delta=refresh_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "refresh_token": new_refresh_token,
+        "token_type": "bearer",
+    }
+
+
+# Protect your routes with JWT
+@app.get("/protected-route")
+async def protected_route(current_user: User = Depends(get_current_user)):
+    return {"message": "This is a protected route", "user": current_user["username"]}
+
+
 @app.get("/")
-def read_root():
+def read_root(current_user: User = Depends(get_current_user)):
     return {"Hello": "World init project | version 1.2 test update with rolling update"}
 
 
@@ -215,6 +396,7 @@ async def get_image(object_name: str):
             detail=f"Image not found or error accessing image: {str(e)}",
         )
 
+
 @app.get("/cameras")
 def get_cameras():
     records = camera_collection.find({})
@@ -224,7 +406,8 @@ def get_cameras():
         camera["_id"] = str(camera["_id"])
         cameras.append(camera)
     return {"cameras": cameras}
-    
+
+
 @app.get("/camera/{camera_id}")
 def get_camera(camera_id: str):
     record = camera_collection.find_one({"_id": ObjectId(camera_id)})
@@ -234,7 +417,8 @@ def get_camera(camera_id: str):
         return {"camera": camera}
     else:
         raise HTTPException(status_code=404, detail="Camera not found")
-    
+
+
 @app.get("/cameras/location/{location}")
 def get_camera_by_location(location: str):
     records = camera_collection.find({"location": location})
@@ -244,7 +428,8 @@ def get_camera_by_location(location: str):
         camera["_id"] = str(camera["_id"])
         cameras.append(camera)
     return {"cameras": cameras}
-    
+
+
 @app.get("/camera/{camera_id}/capture")
 def capture_image_from_camera(camera_id: str):
     camera = camera_collection.find_one({"_id": ObjectId(camera_id)})
@@ -254,7 +439,8 @@ def capture_image_from_camera(camera_id: str):
         return {"status": "completed", "image_url": image_url}
     else:
         raise HTTPException(status_code=404, detail="Camera not found")
-    
+
+
 @app.delete("/camera/{camera_id}")
 def delete_camera(camera_id: str):
     camera = camera_collection.find_one_and_delete({"_id": ObjectId(camera_id)})
@@ -263,50 +449,47 @@ def delete_camera(camera_id: str):
     else:
         raise HTTPException(status_code=404, detail="Camera not found")
 
+
 class CameraCreate(BaseModel):
     name: str
     url: str
     location: str
 
+
 @app.post("/camera")
 def add_camera(camera: CameraCreate):
-    camera_dict = {
-        "name": camera.name,
-        "url": camera.url,
-        "location": camera.location
-    }
+    camera_dict = {"name": camera.name, "url": camera.url, "location": camera.location}
     result = camera_collection.insert_one(camera_dict)
     return {
-        "status": "completed", 
-        "camera": {
-            **camera_dict,
-            "_id": str(result.inserted_id)
-        }
+        "status": "completed",
+        "camera": {**camera_dict, "_id": str(result.inserted_id)},
     }
 
-    
+
 def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
     cap = cv2.VideoCapture(cam_rtsp_url)
     if not cap.isOpened():
         print("Unable to connect to RTSP stream")
         raise HTTPException(status_code=500, detail="Unable to connect to RTSP stream")
-    
+
     ret, frame = cap.read()
     cap.release()
     if not ret:
         print("Unable to read frame from RTSP stream")
-        raise HTTPException(status_code=500, detail="Unable to read frame from RTSP stream")
-    
+        raise HTTPException(
+            status_code=500, detail="Unable to read frame from RTSP stream"
+        )
+
     ret, buffer = cv2.imencode(".jpg", frame)
 
     if not ret:
         print("Unable to encode image as JPEG")
         raise HTTPException(status_code=500, detail="Unable to encode image as JPEG")
-    
+
     image_bytes = buffer.tobytes()
     timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
     object_name = f"captured_{uuid.uuid4()}_{timestamp_str}.jpg"
-    
+
     try:
         data = io.BytesIO(image_bytes)
         minio_client.put_object(
@@ -319,7 +502,7 @@ def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
     except Exception as e:
         print(f"Upload to MinIO failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Upload to MinIO failed: {str(e)}")
-    
+
     try:
         image_url = minio_client.presigned_get_object(
             BUCKET_NAME, object_name, expires=timedelta(days=7)
@@ -331,7 +514,7 @@ def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
     except Exception as e:
         print(f"Generate URL failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
-    
+
     record = {
         "timestamp": datetime.now(),
         "type": "capture",
@@ -342,6 +525,7 @@ def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
     }
     images_collection.insert_one(record)
     return image_url
+
 
 def capture_and_save_image():
     cap = cv2.VideoCapture(rtsp_url)

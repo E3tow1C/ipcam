@@ -1,2 +1,3 @@
 # Ignore .DS_Store files throughout the repository
 .DS_Store
+api/.env

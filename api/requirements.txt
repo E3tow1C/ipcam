@@ -6,3 +6,5 @@ pymongo
 opencv-python
 python-multipart
 pydantic
+python-jose
+passlib[bcrypt]
