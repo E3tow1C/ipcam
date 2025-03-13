@@ -23,7 +23,7 @@ const fetchAPI = async (
       method,
       headers,
       body: body instanceof FormData ? body : body ? JSON.stringify(body) : null,
-      ...(!token && { credentials: 'include' }),
+      credentials: 'include',
     });
 
     const data = await res.json();
@@ -143,7 +143,8 @@ export const authLogin = async (userCredential: userCredential): Promise<loginRe
     const response = await fetch(API_ROUTES.AUTH.LOGIN, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: formData
+      body: formData,
+      credentials: "include",
     });
 
     const responseData = await response.json();
