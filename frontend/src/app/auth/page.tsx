@@ -3,16 +3,18 @@
 import { authLogin, loginResponse, userCredential } from '@/services/apis';
 import { faChartPie, faCheck, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import{ useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 
 function Page() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectPath = searchParams.get("redirect") || "/";
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
-    const router = useRouter();
 
     const handleLogin = async () => {
         setIsLoading(true);
@@ -27,7 +29,7 @@ function Page() {
             const response: loginResponse = await authLogin(userCredential);
 
             if (response.success) {
-                router.push("/");
+                router.replace(redirectPath);
             }
             
             if (!response.success && response.message) {
