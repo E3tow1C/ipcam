@@ -25,16 +25,16 @@ export default async function Home() {
               Add Camera
             </Link>
           </nav>
-          <div className="w-[90%] mx-auto mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="w-full mx-auto mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
             {
               cameras.map((camera, index) => (
                 <Link key={index} className="bg-gray-50 border rounded-xl hover:bg-gray-100 transition-all p-4" href={`/ipcam/${camera._id}`}>
-                  <div className="bg-gray-800 rounded-xl h-80 shadow-xl flex items-center justify-center text-white text-center relative">
+                  <div className="bg-gray-800 rounded-xl shadow-xl flex items-center justify-center text-white text-center relative">
                     <img
                       src={camera.url}
                       alt="ipcam"
-                      className="w-full h-full object-cover rounded-lg"
+                      className="w-full h-56 object-cover rounded-lg"
                     />
                     <div className="absolute top-0 left-0 right-0 flex justify-between p-2">
 

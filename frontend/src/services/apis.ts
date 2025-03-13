@@ -96,9 +96,9 @@ export const getCamerasByLocation = async (location: string): Promise<CameraData
   }
 }
 
-export const addCamera = async (camera: CameraData): Promise<CameraData> => {
+export const addCamera = async (name: string, url: string, location: string): Promise<CameraData> => {
   try {
-    const response = await fetchAPI(API_ROUTES.CAMERA.POST, 'POST', camera);
+    const response = await fetchAPI(API_ROUTES.CAMERA.POST, 'POST', { name, url, location });
     return response.camera;
   }
   catch (error) {

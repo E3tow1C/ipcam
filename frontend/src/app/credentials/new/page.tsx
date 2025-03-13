@@ -33,7 +33,7 @@ export default async function Home() {
 
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="exp">Credentials Expire Date</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="exp" type="date" placeholder="Expiry Date" />
+                    id="exp" type="date" placeholder="Expiry Date" min={new Date().toISOString().split('T')[0]} />
                     <div className="flex items-center mt-2 ml-1 gap-2">
                       <input type="checkbox" id="no-exp" name="no-exp" value="no-exp" />
                       <label htmlFor="no-exp" className="text-gray-500"> No Expiry</label>
