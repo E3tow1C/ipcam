@@ -64,8 +64,6 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/auth/validate",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
-            print(f"Token: {token}")
-            print(f"header: {request.headers}")
 
             if token and token.startswith("Bearer"):
                 token = token.split(" ")[1]
@@ -73,7 +71,6 @@ class JWTMiddleware(BaseHTTPMiddleware):
                 token = request.cookies.get("access_token")
 
             if not token:
-                print("No token found")
                 return JSONResponse(
                     status_code=401, content={"detail": "Not authenticated"}
                 )
@@ -81,9 +78,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
             try:
                 payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 request.state.username = payload.get("sub")
-                print(f"Authenticated user: {request.state.username}")
             except JWTError:
-                print("Invalid token")
                 return JSONResponse(
                     status_code=401, content={"detail": "Invalid token"}
                 )
