@@ -54,7 +54,8 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/auth/login",
             "/docs",
             "/openapi.json",
-            "/refresh",
+            "/auth/refresh",
+            "/auth/validate",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
 
@@ -265,7 +266,7 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str
 
 
-@app.post("/refresh", response_model=dict)
+@app.post("/auth/refresh", response_model=dict)
 async def refresh_access_token(request: RefreshTokenRequest):
     credentials_exception = HTTPException(
         status_code=401,
@@ -290,14 +291,53 @@ async def refresh_access_token(request: RefreshTokenRequest):
     new_refresh_token = create_refresh_token(
         data={"sub": user["username"]}, expires_delta=refresh_token_expires
     )
-    return {
-        "access_token": access_token,
-        "refresh_token": new_refresh_token,
-        "token_type": "bearer",
-    }
+
+    response = JSONResponse(
+        content={"access_token": access_token, "refresh_token": new_refresh_token}
+    )
+
+    response.set_cookie(
+        key="refresh_token", value=new_refresh_token, httponly=True, path="/", secure=True
+    )
+    response.set_cookie(
+        key="access_token", value=access_token, httponly=True, path="/", secure=True
+    )
+
+    return response
 
 
-# Protect your routes with JWT
+@app.get("/auth/validate")
+async def validate_token(request: Request):
+    try:
+        token = request.cookies.get("access_token")
+
+        if not token:
+            return {"success": False}
+
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+
+        if not username:
+            return {"success": False, "message": "Invalid request"}
+
+        user = user_collection.find_one({"username": username})
+        if not user:
+            return {"success": False, "message": "User error"}
+
+        return {"success": True, "message": "Token is valid"}
+
+    except jwt.ExpiredSignatureError:
+        return {"success": False, "message": "Token has expired"}
+    except JWTError:
+        return {"success": False, "message": "Invalid token"}
+    except Exception as e:
+        return {
+            "success": False,
+            "isVerified": False,
+            "message": f"Error validating token: {str(e)}",
+        }
+
+
 @app.get("/protected-route")
 async def protected_route(current_user: User = Depends(get_current_user)):
     return {"message": "This is a protected route", "user": current_user["username"]}
@@ -631,7 +671,7 @@ def capture_and_save_image():
         image_url = image_url.replace(
             "http://minio:9000", f"{API_EXTERNAL_URL}/storage"
         )
-        print(f"Image URL: {image_url}")
+
     except Exception as e:
         print(f"Generate URL failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
