@@ -77,8 +77,8 @@ function MunuItems() {
       <MenuItem href="/upload" icon={faUpload} label="Upload" />
       <MenuItem href="/ipcam" icon={faVideoCamera} label="IP Camera" />
       <div className="w-[90%] mx-auto my-3 h-[1px] bg-gray-200"></div>
-      <MenuItem href="/Accounts" icon={faUserAlt} label="Accounts" />
-      <MenuItem href="/Credentials" icon={faKey} label="Credentials" />
+      <MenuItem href="/accounts" icon={faUserAlt} label="Accounts" />
+      <MenuItem href="/credentials" icon={faKey} label="Credentials" />
     </>
   )
 }
