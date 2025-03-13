@@ -15,5 +15,9 @@ export const API_ROUTES = {
   },
   IMAGES: {
     ALL: `${BASE_API_URL}/images`,
-  }
+  },
+  AUTH: {
+    LOGIN: `${BASE_API_URL}/auth/login`,
+    LOGOUT: `${BASE_API_URL}/auth/logout`,
+  },
 };
