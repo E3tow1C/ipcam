@@ -54,6 +54,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/docs",
             "/",
             "/refresh",
+            "/auth/login",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
             if token is None or not token.startswith("Bearer "):
@@ -490,6 +491,35 @@ def delete_camera(camera_id: str):
     else:
         raise HTTPException(status_code=404, detail="Camera not found")
 
+@app.post("/auth/login", 
+          summary="Login",
+          description="Login to the system",
+          responses={
+              200: {"description": "Login successful"},
+              401: {"description": "Incorrect username or password"},
+              500: {"description": "Internal server error"},
+          },
+)
+def login(user: User):
+    user = authenticate_user(user.username, user.password)
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    access_token = create_access_token(
+        data={"sub": user["username"]}, expires_delta=access_token_expires
+    )
+    refresh_token = create_refresh_token(
+        data={"sub": user["username"]}, expires_delta=refresh_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+    }
 
 class CameraCreate(BaseModel):
     name: str
