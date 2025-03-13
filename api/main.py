@@ -49,6 +49,12 @@ rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # DON'T DELETE THIS LINE - IT'S NEEDED FOR CORS PREFLIGHT REQUESTS
+        if request.method == "OPTIONS":
+            response = await call_next(request)
+            return response
+        #### END OF LINE #####
+
         if request.url.path not in [
             "/",
             "/auth/login",
@@ -58,13 +64,16 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/auth/validate",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
+            print(f"Token: {token}")
+            print(f"header: {request.headers}")
 
-            if token and token.startswith("Bearer "):
+            if token and token.startswith("Bearer"):
                 token = token.split(" ")[1]
             else:
                 token = request.cookies.get("access_token")
 
             if not token:
+                print("No token found")
                 return JSONResponse(
                     status_code=401, content={"detail": "Not authenticated"}
                 )
@@ -72,7 +81,9 @@ class JWTMiddleware(BaseHTTPMiddleware):
             try:
                 payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 request.state.username = payload.get("sub")
+                print(f"Authenticated user: {request.state.username}")
             except JWTError:
+                print("Invalid token")
                 return JSONResponse(
                     status_code=401, content={"detail": "Invalid token"}
                 )
@@ -253,7 +264,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
 
     response.set_cookie(
-        key="access_token", value=access_token, httponly=True, path="/", secure=True
+        key="access_token", value=access_token, path="/", secure=True
     )
 
     response.set_cookie(
@@ -296,7 +307,7 @@ async def refresh_access_token(request: Request):
     )
 
     response.set_cookie(
-        key="access_token", value=new_access_token, httponly=True, path="/", secure=True
+        key="access_token", value=new_access_token, path="/", secure=True
     )
 
     response.set_cookie(
@@ -557,11 +568,20 @@ class CameraCreate(BaseModel):
     name: str
     url: str
     location: str
+    username: str = None
+    password: str = None
+    authType: str = None
+
 
 
 @app.post("/camera")
 def add_camera(camera: CameraCreate):
+    print("camera: ", camera)
     camera_dict = {"name": camera.name, "url": camera.url, "location": camera.location}
+
+    if camera.username and camera.password and camera.authType:
+        camera_dict.update({"username": camera.username, "password": camera.password, "authType": camera.authType})
+    print("camera_dict: ", camera_dict)
     result = camera_collection.insert_one(camera_dict)
     return {
         "status": "completed",
