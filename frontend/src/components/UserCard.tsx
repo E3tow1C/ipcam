@@ -1,4 +1,4 @@
-import { faArrowRightFromBracket, faRightFromBracket, faUserAlt } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRightFromBracket, faUserAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react'
 
