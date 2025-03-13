@@ -123,3 +123,55 @@ export const captureCameraImage = async (id: string): Promise<string> => {
     throw error;
   }
 };
+
+export type userCredential = {
+  username: string;
+  password: string;
+};
+
+export type loginResponse = {
+  success: boolean;
+  message: string;
+};
+
+export const authLogin = async (userCredential: userCredential): Promise<loginResponse> => {
+  try {
+    const formData = new URLSearchParams();
+    formData.append('username', userCredential.username);
+    formData.append('password', userCredential.password);
+
+    const response = await fetch(API_ROUTES.AUTH.LOGIN, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: formData
+    });
+    
+    const responseData = await response.json();
+    if (response.ok) {
+      const data: loginResponse = {
+        success: true,
+        message: "Login successful",
+      };
+
+      return data;
+    }
+
+    if (response.status === 401) {
+      const data: loginResponse = {
+        success: false,
+        message: responseData.detail,
+      };
+      return data;
+    }
+
+    console.log("reposne from login: ", response);
+
+    return {
+      success: false,
+      message: "Something went wrong",
+    };
+
+  } catch (e) {
+    throw e;
+  }
+}
