@@ -1,10 +1,10 @@
 'use client';
 import Sidebar from "@/components/SideBar";
-import { addCamera, getAllCameras } from "@/services/apis";
+import { addCamera } from "@/services/apis";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faArrowLeft, faCheck, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faAngleLeft, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
 export default function Home() {
