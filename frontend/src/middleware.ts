@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { API_ROUTES } from "./constants/api-routes";
 
+type authValidateResponse = {
+  success: boolean;
+  message?: string;
+};
+
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublicPath = path === '/auth' || path.startsWith('/auth/');
@@ -16,7 +21,7 @@ export async function middleware(request: NextRequest) {
         credentials: "include",
       });
 
-      const validateData = await validateResponse.json();
+      const validateData: authValidateResponse = await validateResponse.json();
 
       if (validateData.success) {
         return NextResponse.redirect(new URL('/', request.url));
@@ -41,7 +46,7 @@ export async function middleware(request: NextRequest) {
         }
       });
 
-      const validateData = await validateResponse.json();
+      const validateData: authValidateResponse = await validateResponse.json();
 
       if (validateData.success) {
         return NextResponse.next();
