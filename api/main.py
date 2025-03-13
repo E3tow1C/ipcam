@@ -53,6 +53,8 @@ API_EXTERNAL_URL = os.getenv("API_EXTERNAL_URL")
 
 # MinIO connection
 MINIO_HOST = os.getenv("MINIO_HOST")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 
 # First user
 FIRST_USER = os.getenv("FIRST_USER")
@@ -135,8 +137,8 @@ if user_collection.count_documents({"username": FIRST_USER}) == 0:
 
 minio_client = Minio(
     MINIO_HOST,
-    access_key="root",
-    secret_key="password",
+    access_key=MINIO_ACCESS_KEY,
+    secret_key=MINIO_SECRET_KEY,
     region="us-east-1",
     secure=False,
 )
