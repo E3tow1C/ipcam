@@ -396,6 +396,18 @@ async def create_user(user: User):
     return {"success": True, "message": "Account created successfully"}
 
 
+@app.delete("/account/{id}")
+async def delete_user(id: str):
+    if len(id) != 24:
+        return {"success": False, "message": "Invalid user id format"}
+    
+    if user_collection.count_documents({"_id": ObjectId(id)}) == 0:
+        return {"success": False, "message": "User not found"}
+    
+    user_collection.delete_one({"_id": ObjectId(id)})
+    return {"success": True, "message": "User id: {id} deleted successfully"}
+
+
 @app.get("/protected-route")
 async def protected_route(current_user: User = Depends(get_current_user)):
     return {"message": "This is a protected route", "user": current_user["username"]}
