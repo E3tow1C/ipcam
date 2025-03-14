@@ -50,28 +50,28 @@ export default function Home() {
               Dashboard
             </h1>
           </nav>
-          <main className="mt-8">
+          <main className="mt-8 max-w-[1200px] mx-auto">
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Total Cameras</p>
-                <h2 className="mt-2 text-xl font-bold">{metrics.total_cameras}</h2>
+                <h2 className="mt-2 text-2xl font-bold">{metrics.total_cameras}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Total Images</p>
-                <h2 className="mt-2 text-xl font-bold">{metrics.total_images}</h2>
+                <h2 className="mt-2 text-2xl font-bold">{metrics.total_images}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Total Images Uploaded</p>
-                <h2 className="mt-2 text-xl font-bold">{metrics.total_images_uploaded}</h2>
+                <h2 className="mt-2 text-2xl font-bold">{metrics.total_images_uploaded}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Total Images Captured</p>
-                <h2 className="mt-2 text-xl font-bold">{metrics.total_images_captured}</h2>
+                <h2 className="mt-2 text-2xl font-bold">{metrics.total_images_captured}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Today Images</p>
-                <h2 className="mt-2 text-xl font-bold">{metrics.today_images}</h2>
+                <h2 className="mt-2 text-2xl font-bold">{metrics.today_images}</h2>
               </div>
             </div>
             
@@ -79,11 +79,11 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Total Credentials</p>
-                <h2 className="mt-2 text-xl font-bold">{metrics.total_credentials}</h2>
+                <h2 className="mt-2 text-2xl font-bold">{metrics.total_credentials}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-500">Total Users</p>
-                <h2 className="mt-2 text-xl font-bold">{metrics.total_users}</h2>
+                <h2 className="mt-2 text-2xl font-bold">{metrics.total_users}</h2>
               </div>
             </div>
 
