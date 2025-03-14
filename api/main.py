@@ -413,7 +413,7 @@ async def create_user(user: User):
 
 @app.delete("/account/{id}")
 async def delete_user(id: str):
-    if len(id) != 24:
+    if not ObjectId.is_valid(id):
         return {"success": False, "message": "Invalid user id format"}
 
     if user_collection.count_documents({"_id": ObjectId(id)}) == 0:
@@ -481,7 +481,7 @@ async def create_credential(credential: Credential):
 
 @app.delete("/credential/{id}")
 async def delete_credential(id: str):
-    if len(id) != 24:
+    if not ObjectId.is_valid(id):
         return {"success": False, "message": "Invalid credential id format"}
 
     if creadenials_collection.count_documents({"_id": ObjectId(id)}) == 0:
@@ -663,7 +663,7 @@ def get_cameras():
 
 @app.get("/camera/{camera_id}")
 def get_camera(camera_id: str):
-    if len(camera_id) != 24:
+    if not ObjectId.is_valid(camera_id):
         raise HTTPException(status_code=404, detail="Camera not found")
 
     record = camera_collection.find_one({"_id": ObjectId(camera_id)})
@@ -677,20 +677,70 @@ def get_camera(camera_id: str):
 
 @app.get(
     "/camera/{camera_id}/images",
-    summary="Get images from a camera",
-    description="Get all images captured by a camera",
+    summary="Get images from a camera with optional date filtering",
+    description="Get images from a specified camera with optional date range filtering. Use start and end parameters in ISO format (YYYY-MM-DDTHH:MM:SS)",
 )
-def get_images_from_camera(camera_id: str):
-    if len(camera_id) != 24:
-        raise {"success": False, "message": "Invalid camera id format"}
+def get_images_from_camera_by_date(camera_id: str, start: str = None, end: str = None):
+    try:
+        if not ObjectId.is_valid(camera_id):
+            return {"success": False, "message": "Invalid camera id format"}
 
-    camera = camera_collection.find_one({"_id": ObjectId(camera_id)})
-    if not camera:
-        raise {"success": False, "message": "Camera not found"}
+        camera = camera_collection.find_one({"_id": ObjectId(camera_id)})
+        if not camera:
+            return {"success": False, "message": "Camera not found"}
 
-    records = images_collection.find({"camera_id": camera_id})
-    all_image_urls = [record["image_url"] for record in records]
-    return {"success": True, "images": all_image_urls}
+        query = {"camera_id": camera_id}
+
+        if start or end:
+            query["timestamp"] = {}
+
+            if start and not end:
+                try:
+                    start_date = datetime.fromisoformat(start)
+                    query["timestamp"]["$gte"] = start_date
+                except ValueError:
+                    return {
+                        "success": False,
+                        "message": "Invalid start date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)",
+                    }
+
+            elif start and end:
+                try:
+                    start_date = datetime.fromisoformat(start)
+                    end_date = datetime.fromisoformat(end)
+                    query["timestamp"]["$gte"] = start_date
+                    query["timestamp"]["$lte"] = end_date
+                except ValueError:
+                    return {
+                        "success": False,
+                        "message": "Invalid date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)",
+                    }
+
+            elif end and not start:
+                try:
+                    end_date = datetime.fromisoformat(end)
+                    query["timestamp"]["$lte"] = end_date
+                except ValueError:
+                    return {
+                        "success": False,
+                        "message": "Invalid end date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)",
+                    }
+
+        records = images_collection.find(query).sort(
+            "timestamp", -1
+        )  # Sort by newest first
+
+        image_urls = [record["image_url"] for record in records]
+
+        return {
+            "success": True,
+            "camera": camera["name"],
+            "images_count": len(image_urls),
+            "images": image_urls,
+        }
+
+    except Exception as e:
+        return {"success": False, "message": f"Error retrieving images: {str(e)}"}
 
 
 @app.get("/cameras/location/{location}")
@@ -755,7 +805,7 @@ def add_camera(camera: CameraCreate):
 
 @app.patch("/camera/{camera_id}")
 def update_camera(camera_id: str, camera: CameraCreate):
-    if len(camera_id) != 24:
+    if not ObjectId.is_valid(camera_id):
         return {"success": False, "message": "Invalid camera id format"}
 
     if camera_collection.count_documents({"_id": ObjectId(camera_id)}) == 0:
