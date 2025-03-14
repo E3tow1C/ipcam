@@ -1,8 +1,8 @@
 "use client";
 
 import Sidebar from "@/components/SideBar";
-import { CameraData, getAllCameras, getFilteredImages } from "@/services/apis";
-import { faCamera, faChevronDown, faCopy, faImage } from "@fortawesome/free-solid-svg-icons";
+import { CameraData, deleteImage, getAllCameras, getFilteredImages } from "@/services/apis";
+import { faCamera, faChevronDown, faCopy, faImage, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -19,7 +19,7 @@ export type ImageDataProb = {
 export default function Home() {
   const [images, setImages] = useState<ImageDataProb[]>([]);
   const [cameras, setCameras] = useState<CameraData[]>([]);
-  const [now, setNow] = useState<string>("");
+  const [tomorrow, setTomorrow] = useState<string>("");
   const [selectedSource, setSelectedSource] = useState<string>("all");
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
@@ -36,7 +36,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    setNow(new Date().toISOString().split(".")[0]);
+    setTomorrow(new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16));
 
     async function fetchCameras() {
       const cameras: CameraData[] = await getAllCameras();
@@ -53,6 +53,14 @@ export default function Home() {
   useEffect(() => {
     handleFilterImages();
   }, [fromDate, toDate, selectedSource]);
+
+  const handleDeleteImage = async (id: string) => {
+    const res = await deleteImage(id);
+    if (res) {
+      handleFilterImages();
+      toast.success('Image deleted');
+    }
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -93,7 +101,7 @@ export default function Home() {
                       Clear
                     </button>
                   </div>
-                  <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={now} onChange={(e) => setFromDate(e.target.value)} value={fromDate} />
+                  <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={tomorrow} onChange={(e) => setFromDate(e.target.value)} value={fromDate} />
                 </div>
 
                 <div className="w-full">
@@ -103,7 +111,7 @@ export default function Home() {
                       Clear
                     </button>
                   </div>
-                  <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={now} onChange={(e) => setToDate(e.target.value)} value={toDate} />
+                  <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={tomorrow} onChange={(e) => setToDate(e.target.value)} value={toDate} />
                 </div>
 
               </div>
@@ -112,21 +120,13 @@ export default function Home() {
             {images && images.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {images.reverse().map((img, index) => (
-                  <div key={index} className="overflow-hidden rounded-lg bg-white border p-2 relative">
+                  <div key={index} className="overflow-hidden rounded-lg bg-white border p-2">
                     <img
                       src={img.image_url}
                       alt={`Image ${index + 1}`}
                       className="w-full h-64 rounded-md object-cover cursor-pointer"
                       onClick={() => window.open(img.image_url, '_blank')}
                     />
-                    <button className="bg-gray-50 opacity-70 text-white px-3 py-1 rounded-lg hover:opacity-100 transition-all absolute top-3 right-3"
-                      onClick={() => {
-                        navigator.clipboard.writeText(img.image_url);
-                        toast.success('Copied to clipboard');
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faCopy} className="text-gray-500 text-sm" />
-                    </button>
                     <div className="flex items-center justify-between mt-2">
                       <p className="text-gray-500 text-sm font-semibold">{typeName(img.type)}</p>
                       <p className="text-gray-500 text-sm">{new Date(img.timestamp).toLocaleString()}</p>
@@ -141,6 +141,22 @@ export default function Home() {
                         </div>
                       )
                     }
+                    <div className="flex w-full items-center justify-between mt-3">
+                      <button className="bg-gray-100 text-gray-500 px-3 py-2 text-sm rounded-lg hover:bg-gray-200 transition-all"
+                        onClick={() => {
+                          navigator.clipboard.writeText(img.image_url);
+                          toast.success('Copied to clipboard');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCopy} className="text-gray-500 text-sm mr-2" />
+                        Copy image URL
+                      </button>
+                      <button className="text-red-400 px-3 py-1 rounded-lg hover:text-red-500 transition-all"
+                        onClick={() => handleDeleteImage(img.id)}
+                      >
+                        <FontAwesomeIcon icon={faTrashAlt} className="text-sm" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -15,6 +15,7 @@ export const API_ROUTES = {
   },
   IMAGES: {
     ALL: `${BASE_API_URL}/images`,
+    BY_ID: (id: string) => `${BASE_API_URL}/delete/${id}`,
     FILTER: (source: string, fromDate: string, toDate: string) => `${BASE_API_URL}/images/filter?source=${source}&from_date=${fromDate}&to_date=${toDate}`,
   },
   AUTH: {

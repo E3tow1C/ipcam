@@ -74,6 +74,16 @@ export const getAllImages = async (): Promise<string[]> => {
   }
 };
 
+export const deleteImage = async (id: string): Promise<boolean> => {
+  try {
+    const accessToken = Cookies.get('access_token');
+    const response = await fetchAPI(API_ROUTES.IMAGES.BY_ID(id), 'DELETE', null, accessToken);
+    return response.status === 'completed';
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getFilteredImages = async (source: string, fromDate: string, toDate: string): Promise<ImageDataProb[]> => {
   try {
     const response = await fetchAPI(API_ROUTES.IMAGES.FILTER(source, fromDate, toDate), 'GET');
