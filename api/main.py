@@ -727,19 +727,6 @@ def get_images_from_camera_by_date(camera_id: str, start: str = None, end: str =
                         "message": "Invalid end date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)",
                     }
 
-        records = images_collection.find(query).sort(
-            "timestamp", -1
-        )  # Sort by newest first
-
-        records_list = list(records)
-        print(
-            "Query results:",
-            [
-                {**{k: str(v) if k == "_id" else v for k, v in doc.items()}}
-                for doc in records_list
-            ],
-        )
-
         records = images_collection.find(query).sort("timestamp", -1)
         image_urls = [record["image_url"] for record in records]
 
