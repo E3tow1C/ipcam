@@ -11,10 +11,12 @@ import { useState, useEffect } from "react";
 
 export default function Home() {
   const [cameras, setCameras] = useState<CameraData[]>([]);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
   useEffect(() => {
     async function fetchCameras() {
       const cameras: CameraData[] = await getAllCameras();
       setCameras(cameras);
+      setIsLoaded(true);
     }
     fetchCameras();
   }, []);
@@ -59,7 +61,7 @@ export default function Home() {
                 ))
               }
               {
-                cameras.length === 0 && (
+                (cameras.length === 0 && isLoaded) && (
                   <button className="w-full bg-white rounded-xl border h-48 flex flex-col items-center justify-center text-gray-400 text-center hover:bg-gray-100 hover:text-gray-700 transition-all cursor-pointer" onClick={() => window.location.href = '/ipcam/new'}>
                     <FontAwesomeIcon icon={faPlus} className="text-4xl mb-2" />
                     <p>Add a new camera</p>
