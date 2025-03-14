@@ -15,6 +15,7 @@ export default function Home() {
         const name = (document.getElementById('name') as HTMLInputElement).value;
         const cameraUrl = (document.getElementById('cameraUrl') as HTMLInputElement).value;
         const location = (document.getElementById('location') as HTMLInputElement).value;
+        const reservedNames = ['All', 'Uploaded Images', 'All Cameras'];
 
         let username = '';
         let password = '';
@@ -28,6 +29,11 @@ export default function Home() {
 
         if (!name || !cameraUrl || !location) {
             setMessage('Please fill all fields');
+            return;
+        }
+
+        if (reservedNames.includes(name)) {
+            setMessage('Name is reserved');
             return;
         }
 

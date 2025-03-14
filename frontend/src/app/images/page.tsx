@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import Sidebar from "@/components/SideBar";
@@ -13,9 +12,14 @@ export default function Home() {
   const [errMsg, setErrMsg] = useState<string>("");
   const [isError, setIsError] = useState<boolean>(false);
   const [cameras, setCameras] = useState<CameraData[]>([]);
-  const now = new Date().toISOString().split(".")[0];
+  const [now, setNow] = useState<string>("");
+  const [selectedSource, setSelectedSource] = useState<string>("all");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
 
   useEffect(() => {
+    setNow(new Date().toISOString().split(".")[0]);
+
     const fetchImages = async () => {
       try {
         const images = await getAllImages();
@@ -50,14 +54,16 @@ export default function Home() {
           </nav>
           <main className="mt-8">
             <div className="w-full">
-              <div className="flex w-full mb-4 items-center gap-4 justify-between">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
                 <div className="w-full relative">
                   <p className="text-gray-500 mb-1">Images source</p>
-                  <select className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 pr-8 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none">
-                    <option value="all">All</option>
-                    <option value="all">Uploaded Images</option>
-                    <option value="all">All Cameras</option>
+                  <select className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 pr-8 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none"
+                    onChange={(e) => setSelectedSource(e.target.value)}
+                  >
+                    <option value="All Sources">All Sources</option>
+                    <option value="Uploaded Images">Uploaded Images</option>
+                    <option value="All Cameras">All Cameras</option>
                     {cameras.map((camera, index) => (
                       <option key={index} value={camera._id.$oid}>{camera.name}</option>
                     ))}
@@ -70,21 +76,25 @@ export default function Home() {
                 <div className="w-full">
                   <div className="flex items-center justify-between">
                     <p className="text-gray-500 mb-1">From Date</p>
-                    <button className="text-blue-500 hover:underline">Clear</button>
+                    <button className="text-blue-500 hover:underline" onClick={() => setFromDate("")}>
+                      Clear
+                    </button>
                   </div>
-                  <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={now} />
+                  <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={now} onChange={(e) => setFromDate(e.target.value)} value={fromDate} />
                 </div>
 
                 <div className="w-full">
                   <div className="flex items-center justify-between">
                     <p className="text-gray-500 mb-1">To Date</p>
-                    <button className="text-blue-500 hover:underline">Clear</button>
+                    <button className="text-blue-500 hover:underline" onClick={() => setToDate("")}>
+                      Clear
+                    </button>
                   </div>
-                  <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={now} />
+                  <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={now} onChange={(e) => setToDate(e.target.value)} value={toDate} />
                 </div>
 
               </div>
-              <h2 className="text-gray-500 font-semibold mb-2">Total Images: {images.length}</h2>
+              <h2 className="text-gray-500 font-semibold mb-2 mt-4">Total Images: {images.length}</h2>
             </div>
             {images.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
