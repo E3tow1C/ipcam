@@ -51,10 +51,11 @@ export default function Home() {
             </h1>
           </nav>
           <main className="mt-8 max-w-[1200px] mx-auto">
-
+            <h1 className="mb-3 font-semibold text-gray-700">API Endpoint : <span className="bg-gray-100 px-2 py-1 font-normal text-blue-600 rounded-md">{process.env.NEXT_PUBLIC_API_URL}</span></h1>
+            <h1 className="text-xl mb-3 mt-12 font-bold text-gray-700">Images & Cameras</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="p-6 rounded-lg bg-gray-100">
-                <p className="text-sm text-gray-500">Total Cameras</p>
+                <p className="text-sm text-gray-500">IP Cameras</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_cameras}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
@@ -62,11 +63,11 @@ export default function Home() {
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_images}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
-                <p className="text-sm text-gray-500">Total Images Uploaded</p>
+                <p className="text-sm text-gray-500">Total Uploaded Images</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_images_uploaded}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
-                <p className="text-sm text-gray-500">Total Images Captured</p>
+                <p className="text-sm text-gray-500">Total Captured Images</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_images_captured}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
