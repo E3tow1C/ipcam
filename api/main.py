@@ -94,6 +94,14 @@ pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# MongoDB connection
+mongo_client = MongoClient(MONGO_URL)
+db = mongo_client["camera_db"]
+images_collection = db["images"]
+camera_collection = db["cameras"]
+auth_collection = db["auth"]
+user_collection = db["users"]
+creadenials_collection = db["creadenials"]
 
 # User model
 class User(BaseModel):
@@ -150,13 +158,6 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
-
-mongo_client = MongoClient(MONGO_URL)
-db = mongo_client["camera_db"]
-images_collection = db["images"]
-camera_collection = db["cameras"]
-auth_collection = db["auth"]
-user_collection = db["users"]
 
 # Initialize the auth collection with a test user
 if user_collection.count_documents({"username": FIRST_USER}) == 0:
