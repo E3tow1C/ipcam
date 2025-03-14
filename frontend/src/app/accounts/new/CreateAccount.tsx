@@ -18,11 +18,6 @@ export async function createAccount(prevState: FormState, formData: FormData): P
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
-
-    console.log("username: ", username);
-    console.log("password: ", password);
-    console.log("confirmPassword: ", confirmPassword);
-
     const errors: FormState['errors'] = {};
 
     if (!username || username.trim() === '') {
@@ -47,24 +42,17 @@ export async function createAccount(prevState: FormState, formData: FormData): P
         };
     }
 
-    try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("access_token")?.value;
-        const response: loginResponse = await createNewAccount({ username, password }, token);
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
+    const response: loginResponse = await createNewAccount({ username, password }, token);
 
-        if (!response.success) {
-            return {
-                message: response.message,
-                success: false
-            };
-        }
-
-        revalidatePath('/accounts');
-        redirect('/accounts', RedirectType.replace);
-    } catch {
+    if (!response.success) {
         return {
-            message: 'An unexpected error occurred',
+            message: response.message,
             success: false
         };
     }
+
+    revalidatePath('/accounts');
+    redirect('/accounts', RedirectType.replace);
 }

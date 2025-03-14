@@ -192,24 +192,12 @@ export const authLogout = async (): Promise<boolean> => {
 
 export const createNewAccount = async (userCredential: userCredential, token?: string): Promise<loginResponse> => {
   try {
-    const response = await fetchAPI(API_ROUTES.ACCOUNTS.CREATE, 'POST', {
+    const response: loginResponse = await fetchAPI(API_ROUTES.ACCOUNTS.CREATE, 'POST', {
       username: userCredential.username,
       password: userCredential.password
     }, token);
 
-    if (!response.success) {
-      return {
-        success: false,
-        message: response.message,
-      };
-    }
-
-    const data: loginResponse = {
-      success: true,
-      message: response.message,
-    };
-
-    return data;
+    return response;
   } catch (error) {
     throw error;
   }
