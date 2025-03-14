@@ -114,7 +114,7 @@ app = FastAPI(
 )
 
 
-allowed_origins = ["http://localhost:3000"]
+allowed_origins = ["http://localhost:3000, http://frontend.localhost:8080"]
 for origin in creadenials_collection.find():
     allowed_origins.append(origin["host"])
 
