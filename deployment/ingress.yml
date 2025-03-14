@@ -11,7 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/enable-cors: "true"
 spec:
   rules:
-    - host: fastapi.localhost
+    - host: api.localhost
       http:
         paths:
           - path: /
