@@ -41,7 +41,7 @@ export async function createAccount(prevState: FormState, formData: FormData): P
 
     if (Object.keys(errors).length > 0) {
         return {
-            message: 'Please fix the errors below',
+            message: '',
             errors,
             success: false
         };
@@ -56,13 +56,6 @@ export async function createAccount(prevState: FormState, formData: FormData): P
             return {
                 message: response.message,
                 success: false
-            };
-        }
-
-        if (response.success) {
-            return {
-                message: 'Account created successfully',
-                success: true
             };
         }
 
