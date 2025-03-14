@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { createAccount } from "./CreateAccount";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 const initialState = {
   message: '',
@@ -15,6 +15,19 @@ const initialState = {
 
 export default function Home() {
   const [state, formAction] = useActionState(createAccount, initialState);
+  const [formValues, setFormValues] = useState({
+    username: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   return (
     <div className="h-screen flex flex-col">
@@ -34,21 +47,21 @@ export default function Home() {
                     <h1 className="text-xl text-gray-700 font-bold ml-1">New Account</h1>
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Username</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                    id="name" name="username" type="text" placeholder="Name for new camera" />
+                    id="name" name="username" type="text" placeholder="Name for new camera" onChange={handleInputChange} value={formValues.username} />
                     {state.errors?.username && (
                         <p className="text-red-500 text-xs mt-1 ml-1">{state.errors.username.join(', ')}</p>
                       )}
 
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="password">Password</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="password" name="password" type="password" placeholder="Password" />
+                    id="password" name="password" type="password" placeholder="Password" onChange={handleInputChange} value={formValues.password} />
                     {state.errors?.password && (
                         <p className="text-red-500 text-xs mt-1 ml-1">{state.errors.password.join(', ')}</p>
                       )}
 
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="confirmPassword">Confirm Password</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" />
+                    id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleInputChange} value={formValues.confirmPassword} />
                     {state.errors?.confirmPassword && (
                         <p className="text-red-500 text-xs mt-1 ml-1">{state.errors.confirmPassword.join(', ')}</p>
                       )}
