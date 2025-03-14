@@ -65,7 +65,7 @@ function page() {
                       <p className="text-gray-500">Host: {credential.host}</p>
                     </div>
                     <div className="flex justify-between items-start">
-                      <div className="px-2 py-2 w-full bg-gray-100 text-blue-500 text-sm rounded-lg">
+                      <div className="px-2 py-2 w-full bg-gray-100 text-blue-500 text-sm rounded-lg overflow-hidden">
                         {showSecret[credential._id] ? credential.secret : credential.secret.replace(/./g, '•')}
                       </div>
                       <button
