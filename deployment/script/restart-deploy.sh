@@ -68,9 +68,9 @@ kubectl apply -f ingress-controller.yml
 
 # Wait for deployments to be ready
 echo "⏳ Waiting for deployments to be ready..."
-kubectl wait --for=condition=available --timeout=300s deployment/mongodb
-kubectl wait --for=condition=available --timeout=300s deployment/minio
-kubectl wait --for=condition=available --timeout=300s deployment/fastapi
 kubectl wait --for=condition=available --timeout=300s deployment/metrics-server -n kube-system
 kubectl wait --for=condition=available --timeout=300s deployment/ingress-nginx-controller -n ingress-nginx
-# kubectl wait --for=condition=available --timeout=300s deployment/frontend
+kubectl wait --for=condition=available --timeout=300s deployment/mongodb
+kubectl wait --for=condition=available --timeout=300s deployment/minio
+kubectl wait --for=condition=available --timeout=300s deployment/frontend
+kubectl wait --for=condition=available --timeout=300s deployment/fastapi
