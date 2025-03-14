@@ -32,3 +32,11 @@ metadata:
 data:
   MINIO_ROOT_USER: "root"
   MINIO_ROOT_PASSWORD: "password"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+data:
+  SERVER_SIDE_URL: "http://fastapi:8000"
+
