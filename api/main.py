@@ -434,8 +434,14 @@ class Credential(BaseModel):
 async def get_all_credentials():
     try:
         credentials = creadenials_collection.find({})
-        all_credentials = [credentials for credentials in credentials]
+        all_credentials = []
+
+        for credential in credentials:
+            credential["_id"] = str(credential["_id"])
+            all_credentials.append(credential)
+
         return {"success": True, "credentials": all_credentials}
+
     except Exception as e:
         return {"success": False, "message": f"Error getting credentials: {str(e)}"}
 
