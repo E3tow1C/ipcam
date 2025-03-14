@@ -506,7 +506,7 @@ async def protected_route(current_user: User = Depends(get_current_user)):
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World init project | version 1.2 test update with rolling update"}
+    return {"Hello": "API IS RUNNING"}
 
 
 @app.post("/upload")
