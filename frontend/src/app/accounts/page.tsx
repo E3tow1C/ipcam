@@ -54,7 +54,7 @@ function page() {
           <div className="w-full mt-6">
             <div className="flex flex-col gap-4">
               {accounts.length > 0 && accounts.map((account) => (
-                <div key={account._id} className="bg-white flex justify-between items-center p-6 border rounded-lg transition-all">
+                <div key={account._id} className="bg-white flex justify-between items-center p-4 py-2 border rounded-lg transition-all">
                   <div className="flex flex-col">
                     <h3 className="text-lg font-medium text-gray-600">{account.username}</h3>
                     <p className="text-sm text-gray-400">ID: {account._id}</p>
