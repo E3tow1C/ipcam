@@ -219,6 +219,16 @@ export type Account = {
   username: string;
 };
 
+export const updateCamera = async (id: string, name: string, url: string, location: string, username?: string, password?: string, authType?: string): Promise<boolean> => {
+  try {
+    const accessToken = Cookies.get('access_token');
+    const response = await fetchAPI(API_ROUTES.CAMERA.BY_ID(id), 'PATCH', { name, url, location, username, password, authType }, accessToken);
+    return response.success;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getAllAccounts = async (token: string): Promise<Account[]> => {
   try {
     const response = await fetchAPI(API_ROUTES.ACCOUNTS.ALL, 'GET', null, token);

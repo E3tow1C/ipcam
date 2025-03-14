@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { captureCameraImage, deleteCamera } from "@/services/apis";
+import { captureCameraImage, deleteCamera, updateCamera } from "@/services/apis";
 import { faCircleNotch, faCameraAlt, faPen, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -67,6 +67,27 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
         }
     };
 
+    const handleUpdateCamera = async () => {
+        if (!formData.name || !formData.url || !formData.location) {
+            setMessage('Please fill all fields');
+            return;
+        }
+
+        const newCameraData = {
+            name: formData.name,
+            url: formData.url,
+            location: formData.location,
+            username: formData.username,
+            password: formData.password,
+            authType: formData.authType
+        }
+
+        const updatedCamera = await updateCamera(cameraId, newCameraData.name, newCameraData.url, newCameraData.location, newCameraData.username, newCameraData.password, newCameraData.authType);
+        if (updatedCamera) {
+            window.location.reload();
+        }
+    }
+
     return (
         <>
             <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
@@ -130,7 +151,7 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                         <form className="w-[90%] mx-auto mb-10"
                             onSubmit={(e) => {
                                 e.preventDefault();
-
+                                handleUpdateCamera();
                             }}
                         >
                             <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Camera Name</label>
