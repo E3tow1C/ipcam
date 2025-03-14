@@ -1,4 +1,5 @@
 export const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
+export const SERVER_SIDE_URL = process.env.SERVER_SIDE_URL;
 
 export const API_ROUTES = {
   IPCAM: `${BASE_API_URL}/capture`,
@@ -21,13 +22,13 @@ export const API_ROUTES = {
   AUTH: {
     LOGIN: `${BASE_API_URL}/auth/login`,
     LOGOUT: `${BASE_API_URL}/auth/logout`,
-    REFRESH: `${BASE_API_URL}/auth/refresh`,
-    VALIDATE: `${BASE_API_URL}/auth/validate`,
+    REFRESH: `${SERVER_SIDE_URL}/auth/refresh`,
+    VALIDATE: `${SERVER_SIDE_URL}/auth/validate`,
   },
   ACCOUNTS: {
     ALL: `${BASE_API_URL}/accounts`,
     BY_ID: (id: string) => `${BASE_API_URL}/account/${id}`,
-    CREATE: `${BASE_API_URL}/account/new`,
+    CREATE: `${SERVER_SIDE_URL}/account/new`,
     DELETE: (id: string) => `${BASE_API_URL}/account/${id}`,
   },
   CREDENTIALS: {
