@@ -1,4 +1,6 @@
 import os
+import secrets
+import base64
 from bson import ObjectId
 from fastapi import FastAPI, HTTPException, UploadFile, File, Depends, Request
 from datetime import datetime, timedelta
@@ -180,7 +182,6 @@ if not minio_client.bucket_exists(BUCKET_NAME):
     minio_client.make_bucket(BUCKET_NAME)
 
 
-# JWT utility functions
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
@@ -426,7 +427,7 @@ class Credential(BaseModel):
     name: str
     host: str
     expire: datetime = None
-    secret: str
+    secret: str = None
 
 
 @app.get("/credentials")
@@ -446,11 +447,19 @@ async def create_credential(credential: Credential):
             "success": False,
             "message": f"Credential name: {credential.name} already exists",
         }
+    
+    if not credential.name or not credential.host:
+        return {
+            "success": False,
+            "message": "Missing required fields",
+        }
 
+    random_secret = secrets.token_bytes(96)
+    api_key = base64.urlsafe_b64encode(random_secret).decode("utf-8").rstrip("=")
     credential_doc = {
         "name": credential.name,
         "host": credential.host,
-        "secret": credential.secret,
+        "secret": api_key,
     }
 
     if credential.expire:
@@ -460,6 +469,7 @@ async def create_credential(credential: Credential):
     return {
         "success": True,
         "message": f"Credential name: {credential.name} created successfully",
+        "secret": api_key,
     }
 
 
