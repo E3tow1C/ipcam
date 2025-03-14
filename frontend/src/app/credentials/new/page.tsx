@@ -1,10 +1,37 @@
+'use client';
 import Sidebar from "@/components/SideBar";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { createNewCredential } from "@/services/apis";
+import { useState } from "react";
 
-export default async function Home() {
+export default function Home() {
+  const [noExp, setNoExp] = useState<boolean>(false);
+
+  const handleAddCredential = async () => {
+    const name = (document.getElementById('name') as HTMLInputElement).value;
+    const host = (document.getElementById('url') as HTMLInputElement).value;
+    const expire = (document.getElementById('exp') as HTMLInputElement).value;
+
+    if (!name || !host) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    if (!noExp && !expire) {
+      toast.error('Please select expiry date');
+      return;
+    }
+
+    const newCredential = await createNewCredential(name, host, noExp ? undefined : new Date(expire));
+    if (newCredential) {
+      window.location.href = '/credentials';
+    } else {
+      toast.error('Failed to add credential');
+    }
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -20,7 +47,7 @@ export default async function Home() {
           </nav>
           <div className="absolute left-0 right-0 top-32">
             <div className="bg-white rounded-xl border w-[90%] max-w-[800px] py-10 mx-auto flex items-center justify-center text-white text-start">
-                <form className="w-[90%] mx-auto">
+                <form className="w-[90%] mx-auto" onSubmit={(e) => { e.preventDefault(); handleAddCredential(); }}>
                     <h1 className="text-xl text-gray-700 font-bold ml-1">New Credentials</h1>
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Service Name</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
@@ -34,10 +61,10 @@ export default async function Home() {
                     </p>
 
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="exp">Credentials Expiry Date</label>
-                    <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="exp" type="date" placeholder="Expiry Date" min={new Date().toISOString().split('T')[0]} />
+                    <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:opacity-50"
+                    id="exp" type="date" placeholder="Expiry Date" min={new Date().toISOString().split('T')[0]} disabled={noExp} />
                     <div className="flex items-center mt-2 ml-1 gap-2">
-                      <input type="checkbox" id="no-exp" name="no-exp" value="no-exp" />
+                      <input type="checkbox" id="no-exp" name="no-exp" value="no-exp" onChange={() => setNoExp(!noExp)} />
                       <label htmlFor="no-exp" className="text-gray-500 select-none"> No Expiry</label>
                     </div>
 

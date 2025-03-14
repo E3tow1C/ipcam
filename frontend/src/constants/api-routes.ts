@@ -28,4 +28,8 @@ export const API_ROUTES = {
     CREATE: `${BASE_API_URL}/account/new`,
     DELETE: (id: string) => `${BASE_API_URL}/account/${id}`,
   },
+  CREDENTIALS: {
+    ALL: `${BASE_API_URL}/credentials`,
+    BY_ID: (id: string) => `${BASE_API_URL}/credential/${id}`,
+    CREATE: `${BASE_API_URL}/credential/new`,}
 };

@@ -5,7 +5,7 @@ import { faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie';
 
 
@@ -21,9 +21,16 @@ function page() {
   }
 
   useEffect(() => {
+    if (toast) {
+      toast.dismiss();
+    }
+    toast.loading('Loading...');
     const fetchAccounts = async () => {
       const accounts = await getAllAccounts(token);
       setAccounts(accounts);
+      setTimeout(() => {
+        toast.dismiss();
+      }, 1000);
     }
 
     fetchAccounts();
@@ -46,10 +53,10 @@ function page() {
           </nav>
           <div className="w-[90%] mx-auto mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {accounts.length > 0 ? accounts.map((account) => (
+              {accounts.length > 0 && accounts.map((account) => (
                 <div key={account._id} className="bg-white p-6 border rounded-lg transition-all">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium text-gray-800">{account.username}</h3>
+                    <h3 className="text-lg font-medium text-gray-600">{account.username}</h3>
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                       Admin
                     </span>
@@ -61,17 +68,7 @@ function page() {
                     </button>
                   </div>
                 </div>
-              )) : (
-                <div className="col-span-2 text-center py-12 bg-white rounded-lg">
-                  <p className="text-gray-500">No accounts found</p>
-                  <Link
-                    href="/accounts/new"
-                    className="mt-3 inline-block text-blue-600 hover:text-blue-800"
-                  >
-                    Create your first account
-                  </Link>
-                </div>
-              )}
+              ))}
             </div>
           </div>
         </div>

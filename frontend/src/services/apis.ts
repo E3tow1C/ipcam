@@ -239,3 +239,30 @@ export const deleteAccount = async (id: string, token: string): Promise<boolean>
     throw error;
   }
 }
+
+export type Credential = {
+  _id: string;
+  name: string;
+  host: string;
+  expire: Date;
+  secret: string;
+};
+
+export const getAllCredentials = async (token: string): Promise<Credential[]> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.CREDENTIALS.ALL, 'GET', null, token);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const createNewCredential = async (name: string, host: string, expire?: Date): Promise<boolean> => {
+  try {
+    const token = Cookies.get('access_token');
+    const response = await fetchAPI(API_ROUTES.CREDENTIALS.CREATE, 'POST', { name, host, expire }, token);
+    return response.success;
+  } catch (error) {
+    throw error;
+  }
+}
