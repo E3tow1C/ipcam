@@ -56,7 +56,7 @@ function page() {
             </Link>
           </nav>
           <div className="w-full mt-6">
-            <div className="flex gap-2 w-full">
+            <div className="flex flex-col gap-4 w-full">
               {
                 credentials.length > 0 && credentials.map((credential) => (
                   <div key={credential._id} className="bg-white w-full p-4 border rounded-lg transition-all">
