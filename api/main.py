@@ -103,18 +103,17 @@ auth_collection = db["auth"]
 user_collection = db["users"]
 creadenials_collection = db["creadenials"]
 
-# User model
-class User(BaseModel):
-    username: str
-    password: str
-
-
 app = FastAPI(
     title="IP Camera API",
     description="API for IP Camera management system",
     version="1.0.0",
     openapi_url="/openapi.json",
 )
+
+# get allowed origins from credentials collection
+allowed_origins = []
+for origin in creadenials_collection.find():
+    allowed_origins.append(origin["host"])
 
 app.add_middleware(
     CORSMiddleware,
@@ -358,16 +357,22 @@ async def validate_token(request: Request):
 
 @app.get("/accounts")
 async def get_all_users():
-   try:
-       accounts = user_collection.find({})
-       all_accounts = []
-       for account in accounts:
-           account['_id'] = str(account['_id'])
-           del account['password']
-           all_accounts.append(account)
-       return {"success": True, "accounts": all_accounts}
-   except Exception as e:
-       return {"success": False, "message": f"Error getting accounts: {str(e)}"}
+    try:
+        accounts = user_collection.find({})
+        all_accounts = []
+        for account in accounts:
+            account["_id"] = str(account["_id"])
+            del account["password"]
+            all_accounts.append(account)
+        return {"success": True, "accounts": all_accounts}
+    except Exception as e:
+        return {"success": False, "message": f"Error getting accounts: {str(e)}"}
+
+
+class User(BaseModel):
+    username: str
+    password: str
+
 
 @app.post("/account/new")
 async def create_user(user: User):
