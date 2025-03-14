@@ -9,7 +9,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie';
 
 
-function page() {
+function Page() {
   const token = Cookies.get('access_token') || '';
   const [accounts, setAccounts] = useState<Account[]>([]);
 
@@ -72,4 +72,4 @@ function page() {
   )
 }
 
-export default page
+export default Page

@@ -1,5 +1,7 @@
+import { MetricData } from '@/app/page';
 import { API_ROUTES } from '../constants/api-routes';
 import Cookies from 'js-cookie';
+import { ImageDataProb } from '@/app/images/page';
 
 type RequestBody = Record<string, unknown> | FormData | null;
 
@@ -72,7 +74,7 @@ export const getAllImages = async (): Promise<string[]> => {
   }
 };
 
-export const getFilteredImages = async (source: string, fromDate: string, toDate: string): Promise<any[]> => {
+export const getFilteredImages = async (source: string, fromDate: string, toDate: string): Promise<ImageDataProb[]> => {
   try {
     const response = await fetchAPI(API_ROUTES.IMAGES.FILTER(source, fromDate, toDate), 'GET');
     return response.images;
@@ -295,7 +297,7 @@ export const deleteCredential = async (id: string, token: string): Promise<boole
   }
 }
 
-export const getDashboardData = async (): Promise<any> => {
+export const getDashboardData = async (): Promise<MetricData> => {
   try {
     const response = await fetchAPI(API_ROUTES.DASHBOARD.ALL, 'GET');
     return response;

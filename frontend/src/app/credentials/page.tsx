@@ -1,14 +1,14 @@
 'use client';
 import Sidebar from '@/components/SideBar'
 import { getAllCredentials, Credential, deleteCredential } from '@/services/apis';
-import { faCopy, faEarDeaf, faEye, faEyeSlash, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { faCopy, faEye, faEyeSlash, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie';
 
-function page() {
+function Page() {
   const [credentials, setCredentials] = React.useState<Credential[]>([]);
   const [showSecret, setShowSecret] = React.useState<{ [key: string]: boolean }>({});
 
@@ -111,4 +111,4 @@ function page() {
   )
 }
 
-export default page
+export default Page

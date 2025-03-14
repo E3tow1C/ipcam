@@ -2,10 +2,10 @@
 
 import Sidebar from "@/components/SideBar";
 import { getDashboardData } from "@/services/apis";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
-type MetricData = {
+export type MetricData = {
   total_cameras: number;
   total_credentials: number;
   total_users: number;

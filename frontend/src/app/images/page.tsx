@@ -1,13 +1,13 @@
 "use client";
 
 import Sidebar from "@/components/SideBar";
-import { CameraData, getAllCameras, getAllImages, getFilteredImages } from "@/services/apis";
-import { faCamera, faChevronDown, faCopy, faImage, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { CameraData, getAllCameras, getFilteredImages } from "@/services/apis";
+import { faCamera, faChevronDown, faCopy, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
-type ImageData = {
+export type ImageDataProb = {
   id: string;
   timestamp: string;
   type: string;
@@ -17,7 +17,7 @@ type ImageData = {
 
 
 export default function Home() {
-  const [images, setImages] = useState<ImageData[]>([]);
+  const [images, setImages] = useState<ImageDataProb[]>([]);
   const [cameras, setCameras] = useState<CameraData[]>([]);
   const [now, setNow] = useState<string>("");
   const [selectedSource, setSelectedSource] = useState<string>("all");
