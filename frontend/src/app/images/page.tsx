@@ -112,7 +112,7 @@ export default function Home() {
             {images && images.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {images.reverse().map((img, index) => (
-                  <div key={index} className="overflow-hidden rounded-lg bg-white border p-2 shadow relative">
+                  <div key={index} className="overflow-hidden rounded-lg bg-white border p-2 relative">
                     <img
                       src={img.image_url}
                       alt={`Image ${index + 1}`}
