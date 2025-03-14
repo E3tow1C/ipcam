@@ -216,3 +216,20 @@ export const createNewAccount = async (userCredential: userCredential, token?: s
     throw error;
   }
 };
+
+export type Account = {
+  _id: string;
+  username: string;
+};
+
+export const getAllAccounts = async (token: string): Promise<Account[]> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.ACCOUNTS.ALL, 'GET', null, token);
+    if (!response.success) {
+      return response.message;
+    }
+    return response.accounts;
+  } catch (error) {
+    throw error;
+  }
+}
