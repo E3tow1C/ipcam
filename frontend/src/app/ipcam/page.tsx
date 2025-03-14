@@ -58,6 +58,14 @@ export default function Home() {
                   </Link>
                 ))
               }
+              {
+                cameras.length === 0 && (
+                  <button className="w-full bg-white rounded-xl border h-48 flex flex-col items-center justify-center text-gray-400 text-center hover:bg-gray-100 hover:text-gray-700 transition-all cursor-pointer" onClick={() => window.location.href = '/ipcam/new'}>
+                    <FontAwesomeIcon icon={faPlus} className="text-4xl mb-2" />
+                    <p>Add a new camera</p>
+                  </button>
+                )
+              }
             </div>
           </div>
         </div>
