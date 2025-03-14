@@ -32,9 +32,6 @@ export default function Home() {
             <div className="bg-white rounded-xl border w-[90%] max-w-[800px] py-10 mx-auto flex items-center justify-center text-white text-start">
                 <form className="w-[90%] mx-auto" action={formAction}>
                     <h1 className="text-xl text-gray-700 font-bold ml-1">New Account</h1>
-                    {state.message && (
-                        <p className="text-red-500 text-xs mt-1 ml-1">{state.message}</p>
-                      )}
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Username</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                     id="name" name="username" type="text" placeholder="Name for new camera" />
@@ -55,6 +52,8 @@ export default function Home() {
                     {state.errors?.confirmPassword && (
                         <p className="text-red-500 text-xs mt-1 ml-1">{state.errors.confirmPassword.join(', ')}</p>
                       )}
+
+                    <p className="text-red-500 text-xs mt-1 ml-1">{state.message}</p>
 
                     <button type="submit" className="bg-blue-500 text-white w-full mt-6 px-3 py-2 rounded-md hover:bg-blue-600 transition-all disabled:opacity-70">
                         <FontAwesomeIcon icon={faCheck} className="mr-2 h-3" />
