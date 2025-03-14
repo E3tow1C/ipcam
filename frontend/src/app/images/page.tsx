@@ -65,7 +65,7 @@ export default function Home() {
                     <option value="upload">Uploaded Images</option>
                     <option value="capture">All Cameras</option>
                     {cameras.map((camera, index) => (
-                      <option key={index} value={camera._id.$oid}>{camera.name}</option>
+                      <option key={index} value={camera._id.toString()}>{camera.name}</option>
                     ))}
                   </select>
                   <div className="absolute right-3 top-[37px] pointer-events-none text-gray-500">
