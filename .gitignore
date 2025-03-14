@@ -2,3 +2,4 @@
 .DS_Store
 api/.env
 api/.api.env
+api/example.txt

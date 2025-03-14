@@ -620,6 +620,82 @@ def get_images():
     return {"all_image_urls": all_image_urls}
 
 
+@app.get("/images/filter")
+def filter_images(source: str, from_date: str = None, to_date: str = None):
+    """
+    Filter images based on source and date range.
+
+    Parameters:
+    - source: Can be 'all', 'capture', 'upload', or a camera_id
+    - from_date: Optional start date in ISO format (YYYY-MM-DDTHH:MM:SS)
+    - to_date: Optional end date in ISO format (YYYY-MM-DDTHH:MM:SS)
+    """
+    try:
+        query = {}
+
+        if source.lower() == "all":
+            pass
+        elif source.lower() == "capture":
+            query["type"] = "capture"
+
+        elif source.lower() == "upload":
+            query["type"] = "upload"
+
+        elif ObjectId.is_valid(source):
+            camera = camera_collection.find_one({"_id": ObjectId(source)})
+            if not camera:
+                return {"success": False, "message": "Camera not found"}
+            query["camera_id"] = source
+
+        else:
+            return {"success": False, "message": "Invalid source parameter"}
+
+        if from_date or to_date:
+            query["timestamp"] = {}
+
+            if from_date:
+                try:
+                    from_datetime = datetime.fromisoformat(from_date)
+                    query["timestamp"]["$gte"] = from_datetime
+                except ValueError:
+                    return {
+                        "success": False,
+                        "message": "Invalid from_date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)",
+                    }
+
+            if to_date:
+                try:
+                    to_datetime = datetime.fromisoformat(to_date)
+                    query["timestamp"]["$lte"] = to_datetime
+                except ValueError:
+                    return {
+                        "success": False,
+                        "message": "Invalid to_date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)",
+                    }
+
+        records = images_collection.find(query).sort("timestamp", -1)
+        images = []
+
+        for record in records:
+            record_dict = {
+                "id": str(record["_id"]),
+                "timestamp": record["timestamp"].isoformat(),
+                "type": record["type"],
+                "image_url": record["image_url"],
+                "object_name": record["object_name"],
+            }
+
+            if "camera_id" in record:
+                record_dict["camera_id"] = record["camera_id"]
+
+            images.append(record_dict)
+
+        return {"success": True, "count": len(images), "images": images}
+
+    except Exception as e:
+        return {"success": False, "message": f"Error filtering images: {str(e)}"}
+
+
 @app.get("/storage/images/{object_name}")
 async def get_image(object_name: str):
     try:
