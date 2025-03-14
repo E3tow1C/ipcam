@@ -72,10 +72,10 @@ export const getAllImages = async (): Promise<string[]> => {
   }
 };
 
-export const getFilteredImages = async (source: string, fromDate: string, toDate: string): Promise<string[]> => {
+export const getFilteredImages = async (source: string, fromDate: string, toDate: string): Promise<any[]> => {
   try {
     const response = await fetchAPI(API_ROUTES.IMAGES.FILTER(source, fromDate, toDate), 'GET');
-    return response.all_image_urls;
+    return response.images;
   } catch (error) {
     throw error;
   }

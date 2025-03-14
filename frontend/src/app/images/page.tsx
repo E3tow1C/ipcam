@@ -6,8 +6,17 @@ import { faChevronDown, faImage, faTriangleExclamation } from "@fortawesome/free
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 
+type ImageData = {
+  id: string;
+  timestamp: string;
+  type: string;
+  image_url: string;
+  camera_id: string;
+};
+
+
 export default function Home() {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<ImageData[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [errMsg, setErrMsg] = useState<string>("");
   const [isError, setIsError] = useState<boolean>(false);
@@ -92,10 +101,10 @@ export default function Home() {
             </div>
             {images.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {images.reverse().map((img: string, index: number) => (
+                {images.reverse().map((img, index) => (
                   <div key={index} className="overflow-hidden rounded shadow">
                     <img
-                      src={img}
+                      src={img.image_url}
                       alt={`Image ${index + 1}`}
                       className="w-full h-64 rounded-lg object-cover"
                     />
