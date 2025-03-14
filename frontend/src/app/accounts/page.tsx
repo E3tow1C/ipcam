@@ -11,7 +11,7 @@ async function page() {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value || "";
   const accounts = await getAllAccounts(token);
-  console.log(accounts)
+
     return (
         <div className="h-screen flex flex-col">
           <Toaster />
