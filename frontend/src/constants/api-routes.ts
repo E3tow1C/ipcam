@@ -22,4 +22,10 @@ export const API_ROUTES = {
     REFRESH: `${BASE_API_URL}/auth/refresh`,
     VALIDATE: `${BASE_API_URL}/auth/validate`,
   },
+  ACCOUNTS: {
+    ALL: `${BASE_API_URL}/accounts`,
+    BY_ID: (id: string) => `${BASE_API_URL}/accounts/${id}`,
+    CREATE: `${BASE_API_URL}/accounts/new`,
+    DELETE: (id: string) => `${BASE_API_URL}/accounts/${id}`,
+  },
 };
