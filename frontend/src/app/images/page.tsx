@@ -17,9 +17,6 @@ type ImageData = {
 
 export default function Home() {
   const [images, setImages] = useState<ImageData[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(true);
-  const [errMsg, setErrMsg] = useState<string>("");
-  const [isError, setIsError] = useState<boolean>(false);
   const [cameras, setCameras] = useState<CameraData[]>([]);
   const [now, setNow] = useState<string>("");
   const [selectedSource, setSelectedSource] = useState<string>("all");
@@ -97,9 +94,9 @@ export default function Home() {
                 </div>
 
               </div>
-              <h2 className="text-gray-500 font-semibold mb-2 mt-4">Total Images: {images.length}</h2>
+              <h2 className="text-gray-500 font-semibold mb-2 mt-4">Total Images: {images && images.length}</h2>
             </div>
-            {images.length > 0 ? (
+            {images && images.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {images.reverse().map((img, index) => (
                   <div key={index} className="overflow-hidden rounded shadow">
@@ -112,9 +109,11 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-64 border border-dashed border-gray-300 rounded-xl">
-                <FontAwesomeIcon icon={isError ? faTriangleExclamation : faImage} className="h-16 w-16 text-gray-500" />
-                <p className="text-gray-500">{isLoading ? "loading images" : (isError ? errMsg : "No images available")}</p>
+              <div className="w-full h-96 flex items-center justify-center">
+                <div className="flex flex-col items-center">
+                  <FontAwesomeIcon icon={faImage} className="text-gray-400 text-4xl" />
+                  <p className="text-gray-400 text-lg mt-4">No images found</p>
+                </div>
               </div>
             )}
           </main>
