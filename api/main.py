@@ -114,13 +114,13 @@ app = FastAPI(
 )
 
 # get allowed origins from credentials collection
-allowed_origins = []
+allowed_origins = ["http://localhost:3000"]
 for origin in creadenials_collection.find():
     allowed_origins.append(origin["host"])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
