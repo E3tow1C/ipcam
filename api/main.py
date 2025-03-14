@@ -1,6 +1,12 @@
 import os
 import secrets
 import base64
+import uvicorn
+import cv2
+import io
+import uuid
+
+import pytz
 from bson import ObjectId
 from fastapi import FastAPI, HTTPException, UploadFile, File, Depends, Request
 from datetime import datetime, timedelta
@@ -19,10 +25,6 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pathlib import Path
 
-import uvicorn
-import cv2
-import io
-import uuid
 
 load_dotenv(dotenv_path=".api.env")
 
@@ -182,12 +184,18 @@ if not minio_client.bucket_exists(BUCKET_NAME):
     minio_client.make_bucket(BUCKET_NAME)
 
 
+def get_bangkok_time():
+    """Return current datetime in Asia/Bangkok timezone."""
+    bangkok_tz = pytz.timezone("Asia/Bangkok")
+    return datetime.now(bangkok_tz)
+
+
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = get_bangkok_time() + expires_delta
     else:
-        expire = datetime.now() + timedelta(minutes=15)
+        expire = get_bangkok_time() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -196,9 +204,9 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 def create_refresh_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = get_bangkok_time() + expires_delta
     else:
-        expire = datetime.now() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = get_bangkok_time() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -506,7 +514,7 @@ def upload_image(file: UploadFile = File(...)):
     try:
         data = file.file.read()
         file_extension = Path(file.filename).suffix
-        object_name = f"uploaded_{uuid.uuid4()}_{datetime.now().strftime("%Y%m%d%H%M%S")}{file_extension}"
+        object_name = f"uploaded_{uuid.uuid4()}_{get_bangkok_time().strftime("%Y%m%d%H%M%S")}{file_extension}"
 
         minio_client.put_object(
             BUCKET_NAME,
@@ -529,7 +537,7 @@ def upload_image(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
 
     record = {
-        "timestamp": datetime.now(),
+        "timestamp": get_bangkok_time(),
         "type": "upload",
         "object_name": object_name,
         "original_filename": file.filename,
@@ -902,7 +910,8 @@ def update_camera(camera_id: str, camera: CameraCreate):
         "message": f"Camera id {camera_id}: updated successfully",
         "camera": camera_to_update,
     }
-    
+
+
 @app.get("/dashboard")
 def dashboard():
     total_cameras = camera_collection.count_documents({})
@@ -911,11 +920,11 @@ def dashboard():
     total_images_uploaded = images_collection.count_documents({"type": "upload"})
     total_images_captured = images_collection.count_documents({"type": "capture"})
     total_images = total_images_uploaded + total_images_captured
-    
-    today_images = images_collection.count_documents({
-        "timestamp": {"$gte": datetime.now().replace(hour=0, minute=0, second=0)}
-    })
-    
+
+    today_images = images_collection.count_documents(
+        {"timestamp": {"$gte": get_bangkok_time().replace(hour=0, minute=0, second=0)}}
+    )
+
     return {
         "total_cameras": total_cameras,
         "total_credentials": total_credentials,
@@ -923,7 +932,7 @@ def dashboard():
         "total_images": total_images,
         "total_images_uploaded": total_images_uploaded,
         "total_images_captured": total_images_captured,
-        "today_images": today_images
+        "today_images": today_images,
     }
 
 
@@ -948,7 +957,7 @@ def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
         raise HTTPException(status_code=500, detail="Unable to encode image as JPEG")
 
     image_bytes = buffer.tobytes()
-    timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
+    timestamp_str = get_bangkok_time().strftime("%Y%m%d%H%M%S")
     object_name = f"captured_{uuid.uuid4()}_{timestamp_str}.jpg"
 
     try:
@@ -977,7 +986,7 @@ def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
         raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
 
     record = {
-        "timestamp": datetime.now(),
+        "timestamp": get_bangkok_time(),
         "type": "capture",
         "object_name": object_name,
         "original_filename": object_name,
@@ -1009,7 +1018,7 @@ def capture_and_save_image():
         raise HTTPException(status_code=500, detail="Unable to encode image as JPEG")
 
     image_bytes = buffer.tobytes()
-    timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
+    timestamp_str = get_bangkok_time().strftime("%Y%m%d%H%M%S")
     object_name = f"captured_{uuid.uuid4()}_{timestamp_str}.jpg"
 
     try:
@@ -1038,7 +1047,7 @@ def capture_and_save_image():
         raise HTTPException(status_code=500, detail=f"Generate URL failed: {str(e)}")
 
     record = {
-        "timestamp": datetime.now(),
+        "timestamp": get_bangkok_time(),
         "type": "capture",
         "object_name": object_name,
         "original_filename": object_name,
