@@ -197,21 +197,19 @@ export const createNewAccount = async (userCredential: userCredential, token?: s
       password: userCredential.password
     }, token);
 
-    const responseData = await response.json();
-
-    if (response.ok) {
-      const data: loginResponse = {
-        success: true,
-        message: responseData.message,
+    if (!response.success) {
+      return {
+        success: false,
+        message: response.message,
       };
-      return data;
     }
 
-    return {
-      success: false,
-      message: "Something went wrong",
+    const data: loginResponse = {
+      success: true,
+      message: response.message,
     };
 
+    return data;
   } catch (error) {
     throw error;
   }
