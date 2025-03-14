@@ -4,7 +4,7 @@ metadata:
   name: fastapi-config
 data:
   MONGO_URL: "mongodb://root:password@mongodb:27017/"
-  MINIO_HOST: "http://minio:9000"
+  MINIO_HOST: "minio:9000"
   SECRET_KEY: "sxb2tBPIyKb7Pg7Yt77TtovVb8aM/ehHaCk5aNMSlhXJBqrz01bZdZN2MT5xn/WxZo3bZja2OadVwKrhd7G4aepJKKi58GLxk7Z7NK65VtgmPGZaVQDxQ2miZLaPnQsHId6OiQdU7ubk1e8p2bh+nMoqczjqXh2l7IpkZZAiHe6ab83L+41Utl0ygy/tRlmhYRywuub3eSw3VI4Bk3/8cAJI/7lZTKya9vchucjIRS8p0BhFu9/htvV63bVCVdhjsygVd5esyDNvbRGjMEzn7A/9kciCdZe/CwWzevdE4yd5Yzbjby5QVv428RMgKhuWakpQ8nZ3YRP2OE478XehaQ=="
   ALGORITHM: HS256
   ACCESS_TOKEN_EXPIRE_MINUTES: "10"
