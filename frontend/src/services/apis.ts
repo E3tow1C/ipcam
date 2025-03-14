@@ -100,6 +100,17 @@ export const getCamerasByLocation = async (location: string): Promise<CameraData
   }
 }
 
+export const deleteCamera = async (id: string): Promise<boolean> => {
+  try {
+    const accessToken = Cookies.get('access_token');
+    const response = await fetchAPI(API_ROUTES.CAMERA.BY_ID(id), 'DELETE', null, accessToken);
+
+    return response.status === 'completed';
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const addCamera = async (name: string, url: string, location: string, username?: string, password?: string, authType?: string): Promise<CameraData> => {
   try {
     const accessToken = Cookies.get('access_token');
@@ -215,6 +226,15 @@ export const getAllAccounts = async (token: string): Promise<Account[]> => {
       return response.message;
     }
     return response.accounts;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const deleteAccount = async (id: string, token: string): Promise<boolean> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.ACCOUNTS.DELETE(id), 'DELETE', null, token);
+    return response.success;
   } catch (error) {
     throw error;
   }

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { captureCameraImage } from "@/services/apis";
+import { captureCameraImage, deleteCamera } from "@/services/apis";
 import { faCircleNotch, faCameraAlt, faPen, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -60,11 +60,18 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
         );
     };
 
+    const handleDeleteCamera = async () => {
+        const isDeleted = await deleteCamera(cameraId);
+        if (isDeleted) {
+            window.location.href = '/ipcam';
+        }
+    };
+
     return (
         <>
             <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
-                <div className="flex items-center justify-between p-3">
-                    <h2 className="text-lg font-bold ml-2">{camera.name}</h2>
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between p-3">
+                    <h2 className="text-lg font-bold ml-2 mb-2 lg:mb-0">{camera.name}</h2>
                     <div className="flex gap-2">
                         {
                             !isConfiguring && (
@@ -111,6 +118,10 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                     </>
                                 )
                             }
+                        </button>
+                        <button className="bg-red-400 text-white px-3 py-2 rounded-md disabled:opacity-70" onClick={handleDeleteCamera}>
+                            <FontAwesomeIcon icon={faXmark} className="mr-2" />
+                            Delete
                         </button>
                     </div>
                 </div>
