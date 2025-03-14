@@ -902,6 +902,29 @@ def update_camera(camera_id: str, camera: CameraCreate):
         "message": f"Camera id {camera_id}: updated successfully",
         "camera": camera_to_update,
     }
+    
+@app.get("/dashboard")
+def dashboard():
+    total_cameras = camera_collection.count_documents({})
+    total_credentials = creadenials_collection.count_documents({})
+    total_users = user_collection.count_documents({})
+    total_images_uploaded = images_collection.count_documents({"type": "upload"})
+    total_images_captured = images_collection.count_documents({"type": "capture"})
+    total_images = total_images_uploaded + total_images_captured
+    
+    today_images = images_collection.count_documents({
+        "timestamp": {"$gte": datetime.now().replace(hour=0, minute=0, second=0)}
+    })
+    
+    return {
+        "total_cameras": total_cameras,
+        "total_credentials": total_credentials,
+        "total_users": total_users,
+        "total_images": total_images,
+        "total_images_uploaded": total_images_uploaded,
+        "total_images_captured": total_images_captured,
+        "today_images": today_images
+    }
 
 
 def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):

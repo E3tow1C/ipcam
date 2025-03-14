@@ -32,5 +32,9 @@ export const API_ROUTES = {
   CREDENTIALS: {
     ALL: `${BASE_API_URL}/credentials`,
     BY_ID: (id: string) => `${BASE_API_URL}/credential/${id}`,
-    CREATE: `${BASE_API_URL}/credential/new`,}
+    CREATE: `${BASE_API_URL}/credential/new`
+  },
+  DASHBOARD: {
+    ALL: `${BASE_API_URL}/dashboard`
+  }
 };

@@ -294,3 +294,12 @@ export const deleteCredential = async (id: string, token: string): Promise<boole
     throw error;
   }
 }
+
+export const getDashboardData = async (): Promise<any> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.DASHBOARD.ALL, 'GET');
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
