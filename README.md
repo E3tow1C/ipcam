@@ -15,6 +15,7 @@
 **Reminder:**
 - Ensure to create `.api.env` in the `api` directory.
 - Also, create a `.env` file for the API URL in the `frontend` directory.
+- For details about each file, please get in touch with the group members.
 
 Run the following command to start the services:
 
