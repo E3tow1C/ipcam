@@ -269,10 +269,21 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
 
     print("COOKIE_DOMAIN: ", COOKIE_DOMAIN)
-    response.set_cookie(key="access_token", value=access_token, path="/", secure=True, domain=COOKIE_DOMAIN)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        path="/",
+        secure=True,
+        domain=COOKIE_DOMAIN,
+    )
 
     response.set_cookie(
-        key="refresh_token", value=refresh_token, httponly=True, path="/", secure=True, domain=COOKIE_DOMAIN
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        path="/",
+        secure=True,
+        domain=COOKIE_DOMAIN,
     )
 
     return response
@@ -281,8 +292,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @app.get("/auth/logout", response_model=dict)
 async def logout():
     response = JSONResponse(content={"success": True})
-    response.delete_cookie(key="refresh_token", path="/", httponly=True, secure=True, domain=COOKIE_DOMAIN)
-    response.delete_cookie(key="access_token", path="/", secure=True, domain=COOKIE_DOMAIN)
+    response.delete_cookie(
+        key="refresh_token", path="/", httponly=True, secure=True, domain=COOKIE_DOMAIN
+    )
+    response.delete_cookie(
+        key="access_token", path="/", secure=True, domain=COOKIE_DOMAIN
+    )
 
     return response
 
@@ -320,7 +335,11 @@ async def refresh_access_token(request: Request):
     )
 
     response.set_cookie(
-        key="access_token", value=new_access_token, path="/", secure=True, domain=COOKIE_DOMAIN
+        key="access_token",
+        value=new_access_token,
+        path="/",
+        secure=True,
+        domain=COOKIE_DOMAIN,
     )
 
     response.set_cookie(
@@ -404,10 +423,10 @@ async def create_user(user: User):
 async def delete_user(id: str):
     if len(id) != 24:
         return {"success": False, "message": "Invalid user id format"}
-    
+
     if user_collection.count_documents({"_id": ObjectId(id)}) == 0:
         return {"success": False, "message": "User not found"}
-    
+
     user_collection.delete_one({"_id": ObjectId(id)})
     return {"success": True, "message": "User id: {id} deleted successfully"}
 
