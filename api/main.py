@@ -447,7 +447,7 @@ async def create_credential(credential: Credential):
             "success": False,
             "message": f"Credential name: {credential.name} already exists",
         }
-    
+
     if not credential.name or not credential.host:
         return {
             "success": False,
@@ -726,6 +726,33 @@ def add_camera(camera: CameraCreate):
     return {
         "status": "completed",
         "camera": {**camera_dict, "_id": str(result.inserted_id)},
+    }
+
+
+@app.patch("/camera/{camera_id}")
+def update_camera(camera_id: str, camera: CameraCreate):
+    if len(camera_id) != 24:
+        return {"success": False, "message": "Invalid camera id format"}
+
+    if camera_collection.count_documents({"_id": ObjectId(camera_id)}) == 0:
+        return {"success": False, "message": "Camera not found"}
+
+    camera_dict = camera.dict()
+    camera_to_update = {}
+
+    for field_name, field_value in camera_dict.items():
+        if field_value is not None:
+            camera_to_update[field_name] = field_value
+
+    if not camera_to_update:
+        return {"success": False, "message": "No fields to update"}
+
+    camera_collection.replace_one({"_id": ObjectId(camera_id)}, camera_to_update)
+
+    return {
+        "success": True,
+        "message": f"Camera id {camera_id}: updated successfully",
+        "camera": camera_to_update,
     }
 
 
