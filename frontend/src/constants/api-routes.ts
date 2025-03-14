@@ -24,8 +24,8 @@ export const API_ROUTES = {
   },
   ACCOUNTS: {
     ALL: `${BASE_API_URL}/accounts`,
-    BY_ID: (id: string) => `${BASE_API_URL}/accounts/${id}`,
-    CREATE: `${BASE_API_URL}/accounts/new`,
-    DELETE: (id: string) => `${BASE_API_URL}/accounts/${id}`,
+    BY_ID: (id: string) => `${BASE_API_URL}/account/${id}`,
+    CREATE: `${BASE_API_URL}/account/new`,
+    DELETE: (id: string) => `${BASE_API_URL}/account/${id}`,
   },
 };
