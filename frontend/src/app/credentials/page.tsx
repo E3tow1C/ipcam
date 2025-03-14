@@ -64,7 +64,7 @@ function page() {
               Add Credential
             </Link>
           </nav>
-          <div className="w-full mt-6">
+          <div className="w-full max-w-[1200px] mx-auto mt-6">
             <div className="flex flex-col gap-4 w-full">
               {
                 credentials.length > 0 && credentials.map((credential) => (

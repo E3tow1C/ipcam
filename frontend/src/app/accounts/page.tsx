@@ -51,7 +51,7 @@ function page() {
               Add Account
             </Link>
           </nav>
-          <div className="w-full mt-6">
+          <div className="w-full max-w-[1200px] mx-auto mt-6">
             <div className="flex flex-col gap-4">
               {accounts.length > 0 && accounts.map((account) => (
                 <div key={account._id} className="bg-white flex justify-between items-center p-4 py-2 border rounded-lg transition-all">

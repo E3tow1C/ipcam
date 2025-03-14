@@ -72,6 +72,15 @@ export const getAllImages = async (): Promise<string[]> => {
   }
 };
 
+export const getFilteredImages = async (source: string, fromDate: string, toDate: string): Promise<string[]> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.IMAGES.FILTER(source, fromDate, toDate), 'GET');
+    return response.all_image_urls;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export type CameraData = {
   _id: { $oid: string };
   name: string;

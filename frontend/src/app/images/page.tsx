@@ -1,7 +1,7 @@
 "use client";
 
 import Sidebar from "@/components/SideBar";
-import { CameraData, getAllCameras, getAllImages } from "@/services/apis";
+import { CameraData, getAllCameras, getAllImages, getFilteredImages } from "@/services/apis";
 import { faChevronDown, faImage, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
@@ -20,27 +20,21 @@ export default function Home() {
   useEffect(() => {
     setNow(new Date().toISOString().split(".")[0]);
 
-    const fetchImages = async () => {
-      try {
-        const images = await getAllImages();
-        setImages(images);
-        setErrMsg("");
-      } catch (error) {
-        setErrMsg("Failed to fetch images");
-        setIsError(true);
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchImages();
-
     async function fetchCameras() {
       const cameras: CameraData[] = await getAllCameras();
       setCameras(cameras);
     }
     fetchCameras();
   }, []);
+
+  const handleFilterImages = async () => {
+    const filteredImages = await getFilteredImages(selectedSource, fromDate, toDate);
+    setImages(filteredImages);
+  };
+
+  useEffect(() => {
+    handleFilterImages();
+  }, [fromDate, toDate, selectedSource]);
 
   return (
     <div className="h-screen flex flex-col">
@@ -61,9 +55,9 @@ export default function Home() {
                   <select className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 pr-8 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none"
                     onChange={(e) => setSelectedSource(e.target.value)}
                   >
-                    <option value="All Sources">All Sources</option>
-                    <option value="Uploaded Images">Uploaded Images</option>
-                    <option value="All Cameras">All Cameras</option>
+                    <option value="all">All Sources</option>
+                    <option value="uploaded">Uploaded Images</option>
+                    <option value="all_cameras">All Cameras</option>
                     {cameras.map((camera, index) => (
                       <option key={index} value={camera._id.$oid}>{camera.name}</option>
                     ))}

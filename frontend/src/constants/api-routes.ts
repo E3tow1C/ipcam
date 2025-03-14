@@ -15,7 +15,7 @@ export const API_ROUTES = {
   },
   IMAGES: {
     ALL: `${BASE_API_URL}/images`,
-    FILTER: (source: string, fromDate: string, toDate: string) => `${BASE_API_URL}/images/filter?source=${source}&from=${fromDate}&to=${toDate}`,
+    FILTER: (source: string, fromDate: string, toDate: string) => `${BASE_API_URL}/images/filter?source=${source}&from_date=${fromDate}&to_date=${toDate}`,
   },
   AUTH: {
     LOGIN: `${BASE_API_URL}/auth/login`,

@@ -36,7 +36,7 @@ export default function Home() {
               Add Camera
             </Link>
           </nav>
-          <div className="w-full mx-auto mt-6">
+          <div className="w-full max-w-[1200px] mx-auto mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
               {
                 cameras.map((camera, index) => (
