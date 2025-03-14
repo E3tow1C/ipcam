@@ -1,10 +1,20 @@
+"use client";
+
 import Sidebar from "@/components/SideBar";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { createAccount } from "./CreateAccount";
+import { useActionState } from "react";
 
-export default async function Home() {
+const initialState = {
+  message: '',
+  errors: {}
+};
+
+export default function Home() {
+  const [state, formAction] = useActionState(createAccount, initialState);
 
   return (
     <div className="h-screen flex flex-col">
@@ -20,21 +30,33 @@ export default async function Home() {
           </nav>
           <div className="absolute left-0 right-0 top-32">
             <div className="bg-white rounded-xl border w-[90%] max-w-[800px] py-10 mx-auto flex items-center justify-center text-white text-start">
-                <form className="w-[90%] mx-auto">
+                <form className="w-[90%] mx-auto" action={formAction}>
                     <h1 className="text-xl text-gray-700 font-bold ml-1">New Account</h1>
+                    {state.message && (
+                        <p className="text-red-500 text-xs mt-1 ml-1">{state.message}</p>
+                      )}
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Username</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                    id="name" type="text" placeholder="Name for new camera" />
+                    id="name" name="username" type="text" placeholder="Name for new camera" />
+                    {state.errors?.username && (
+                        <p className="text-red-500 text-xs mt-1 ml-1">{state.errors.username.join(', ')}</p>
+                      )}
 
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="password">Password</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="password" type="password" placeholder="Password" />
+                    id="password" name="password" type="password" placeholder="Password" />
+                    {state.errors?.password && (
+                        <p className="text-red-500 text-xs mt-1 ml-1">{state.errors.password.join(', ')}</p>
+                      )}
 
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="confirmPassword">Confirm Password</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="confirmPassword" type="password" placeholder="Confirm Password" />
+                    id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" />
+                    {state.errors?.confirmPassword && (
+                        <p className="text-red-500 text-xs mt-1 ml-1">{state.errors.confirmPassword.join(', ')}</p>
+                      )}
 
-                    <button className="bg-blue-500 text-white w-full mt-6 px-3 py-2 rounded-md hover:bg-blue-600 transition-all disabled:opacity-70">
+                    <button type="submit" className="bg-blue-500 text-white w-full mt-6 px-3 py-2 rounded-md hover:bg-blue-600 transition-all disabled:opacity-70">
                         <FontAwesomeIcon icon={faCheck} className="mr-2 h-3" />
                         Done
                     </button>

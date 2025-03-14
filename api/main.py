@@ -64,6 +64,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/auth/validate",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
+            print("headers: ", request.headers)
 
             if token and token.startswith("Bearer"):
                 token = token.split(" ")[1]
@@ -258,9 +259,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         content={"access_token": access_token, "refresh_token": refresh_token}
     )
 
-    response.set_cookie(
-        key="access_token", value=access_token, path="/", secure=True
-    )
+    response.set_cookie(key="access_token", value=access_token, path="/", secure=True)
 
     response.set_cookie(
         key="refresh_token", value=refresh_token, httponly=True, path="/", secure=True
@@ -354,6 +353,21 @@ async def validate_token(request: Request):
             "success": False,
             "message": f"Error validating token: {str(e)}",
         }
+
+
+@app.post("/account/new")
+async def create_user(user: User):
+    if user_collection.count_documents({"username": user.username}) > 0:
+        return {"success": False, "message": "User already exists"}
+
+    user_collection.insert_one(
+        {
+            "username": user.username,
+            "password": pwd_context.hash(user.password),
+        }
+    )
+
+    return {"success": True, "message": "Account created successfully"}
 
 
 @app.get("/protected-route")
@@ -580,14 +594,19 @@ class CameraCreate(BaseModel):
     authType: str = None
 
 
-
 @app.post("/camera")
 def add_camera(camera: CameraCreate):
     print("camera: ", camera)
     camera_dict = {"name": camera.name, "url": camera.url, "location": camera.location}
 
     if camera.username and camera.password and camera.authType:
-        camera_dict.update({"username": camera.username, "password": camera.password, "authType": camera.authType})
+        camera_dict.update(
+            {
+                "username": camera.username,
+                "password": camera.password,
+                "authType": camera.authType,
+            }
+        )
     print("camera_dict: ", camera_dict)
     result = camera_collection.insert_one(camera_dict)
     return {
