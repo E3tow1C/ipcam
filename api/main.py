@@ -130,7 +130,6 @@ app.add_middleware(
 app.add_middleware(JWTMiddleware)
 
 
-
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
@@ -674,6 +673,24 @@ def get_camera(camera_id: str):
         return {"camera": camera}
     else:
         raise HTTPException(status_code=404, detail="Camera not found")
+
+
+@app.get(
+    "/camera/{camera_id}/images",
+    summary="Get images from a camera",
+    description="Get all images captured by a camera",
+)
+def get_images_from_camera(camera_id: str):
+    if len(camera_id) != 24:
+        raise {"success": False, "message": "Invalid camera id format"}
+
+    camera = camera_collection.find_one({"_id": ObjectId(camera_id)})
+    if not camera:
+        raise {"success": False, "message": "Camera not found"}
+
+    records = images_collection.find({"camera_id": camera_id})
+    all_image_urls = [record["image_url"] for record in records]
+    return {"success": True, "images": all_image_urls}
 
 
 @app.get("/cameras/location/{location}")
