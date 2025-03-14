@@ -269,6 +269,15 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return response
 
 
+@app.get("/auth/logout", response_model=dict)
+async def logout():
+    response = JSONResponse(content={"success": True})
+    response.delete_cookie(key="refresh_token", path="/", httponly=True, secure=True)
+    response.delete_cookie(key="access_token", path="/", secure=True)
+
+    return response
+
+
 @app.get("/auth/refresh", response_model=dict)
 async def refresh_access_token(request: Request):
     credentials_exception = HTTPException(
