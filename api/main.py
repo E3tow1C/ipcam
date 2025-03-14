@@ -48,8 +48,6 @@ MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 FIRST_USER = os.getenv("FIRST_USER")
 FIRST_USER_PASSWORD = os.getenv("FIRST_USER_PASSWORD")
 
-COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
-
 rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 
@@ -274,7 +272,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         value=access_token,
         path="/",
         secure=True,
-        domain=COOKIE_DOMAIN,
     )
 
     response.set_cookie(
@@ -283,7 +280,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         httponly=True,
         path="/",
         secure=True,
-        domain=COOKIE_DOMAIN,
     )
 
     return response
@@ -293,10 +289,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 async def logout():
     response = JSONResponse(content={"success": True})
     response.delete_cookie(
-        key="refresh_token", path="/", httponly=True, secure=True, domain=COOKIE_DOMAIN
+        key="refresh_token", path="/", httponly=True, secure=True
     )
     response.delete_cookie(
-        key="access_token", path="/", secure=True, domain=COOKIE_DOMAIN
+        key="access_token", path="/", secure=True
     )
 
     return response
@@ -339,7 +335,6 @@ async def refresh_access_token(request: Request):
         value=new_access_token,
         path="/",
         secure=True,
-        domain=COOKIE_DOMAIN,
     )
 
     response.set_cookie(
@@ -348,7 +343,6 @@ async def refresh_access_token(request: Request):
         httponly=True,
         path="/",
         secure=True,
-        domain=COOKIE_DOMAIN,
     )
 
     return response
