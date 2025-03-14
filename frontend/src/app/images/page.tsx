@@ -65,8 +65,8 @@ export default function Home() {
                     onChange={(e) => setSelectedSource(e.target.value)}
                   >
                     <option value="all">All Sources</option>
-                    <option value="uploaded">Uploaded Images</option>
-                    <option value="all_cameras">All Cameras</option>
+                    <option value="upload">Uploaded Images</option>
+                    <option value="capture">All Cameras</option>
                     {cameras.map((camera, index) => (
                       <option key={index} value={camera._id.$oid}>{camera.name}</option>
                     ))}
