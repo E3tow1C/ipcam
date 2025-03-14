@@ -180,3 +180,12 @@ export const authLogin = async (userCredential: userCredential): Promise<loginRe
     throw error;
   }
 }
+
+export const authLogout = async (): Promise<boolean> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.AUTH.LOGOUT, 'GET');
+    return response.success;
+  } catch (error) {
+    throw error;
+  }
+};
