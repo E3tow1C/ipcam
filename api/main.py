@@ -66,7 +66,6 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/auth/validate",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
-            print("headers: ", request.headers)
 
             if token and token.startswith("Bearer"):
                 token = token.split(" ")[1]
@@ -261,7 +260,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         content={"access_token": access_token, "refresh_token": refresh_token}
     )
 
-    print("COOKIE_DOMAIN: ", COOKIE_DOMAIN)
     response.set_cookie(
         key="access_token",
         value=access_token,
@@ -443,7 +441,6 @@ async def get_all_credentials():
 
 @app.post("/credential/new")
 async def create_credential(credential: Credential):
-    print("credential: ", credential)
     if creadenials_collection.count_documents({"name": credential.name}) > 0:
         return {
             "success": False,
@@ -704,7 +701,6 @@ class CameraCreate(BaseModel):
 
 @app.post("/camera")
 def add_camera(camera: CameraCreate):
-    print("camera: ", camera)
     camera_dict = {"name": camera.name, "url": camera.url, "location": camera.location}
 
     if camera.username and camera.password and camera.authType:
@@ -715,7 +711,7 @@ def add_camera(camera: CameraCreate):
                 "authType": camera.authType,
             }
         )
-    print("camera_dict: ", camera_dict)
+
     result = camera_collection.insert_one(camera_dict)
     return {
         "status": "completed",
