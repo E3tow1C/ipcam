@@ -49,13 +49,6 @@ COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
 rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 
-class Credential(BaseModel):
-    name: str
-    host: str
-    expire: datetime = None
-    secret: str
-
-
 class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # DON'T DELETE THIS LINE - IT'S NEEDED FOR CORS PREFLIGHT REQUESTS
@@ -428,7 +421,39 @@ async def delete_user(id: str):
         return {"success": False, "message": "User not found"}
 
     user_collection.delete_one({"_id": ObjectId(id)})
-    return {"success": True, "message": "User id: {id} deleted successfully"}
+    return {"success": True, "message": f"User id: {id} deleted successfully"}
+
+
+class Credential(BaseModel):
+    name: str
+    host: str
+    expire: datetime = None
+    secret: str
+
+
+@app.get("/credentials")
+async def get_all_credentials():
+    try:
+        credentials = creadenials_collection.find({})
+        all_credentials = [credentials for credentials in credentials]
+        return {"success": True, "credentials": all_credentials}
+    except Exception as e:
+        return {"success": False, "message": f"Error getting credentials: {str(e)}"}
+
+
+@app.post("/credential/new")
+async def create_credential(credential: Credential):
+    if creadenials_collection.count_documents({"name": credential.name}) > 0:
+        return {"success": False, "message": f"Credential name: {credential.name} already exists"}
+
+    creadenials_collection.insert_one(
+        {
+            "name": credential.name,
+            "host": credential.host,
+            "expire": credential.expire,
+            "secret": credential.secret,
+        }
+    )
 
 
 @app.get("/protected-route")
