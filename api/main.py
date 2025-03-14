@@ -47,6 +47,13 @@ FIRST_USER_PASSWORD = os.getenv("FIRST_USER_PASSWORD")
 rtsp_url = "http://218.219.195.24/nphMotionJpeg?Resolution=640x480"
 
 
+class Credential(BaseModel):
+    name: str
+    host: str
+    expire: datetime = None
+    secret: str
+
+
 class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # DON'T DELETE THIS LINE - IT'S NEEDED FOR CORS PREFLIGHT REQUESTS
