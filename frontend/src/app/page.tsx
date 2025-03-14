@@ -56,7 +56,7 @@ export default function Home() {
           <main className="mt-8 max-w-[1200px] mx-auto">
             <h1 className="mb-3 font-semibold text-gray-700">API Endpoint : 
               <span className="bg-gray-100 px-2 py-1 font-normal text-blue-600 rounded-md">{process.env.NEXT_PUBLIC_API_URL}</span>
-              <Link href={process.env.NEXT_PUBLIC_API_URL || ''} target="_blank"><FontAwesomeIcon icon={faExternalLinkAlt} className="ml-2 text-blue-500 cursor-pointer text-sm h-3 w-3" /></Link>
+              <Link href={process.env.NEXT_PUBLIC_API_URL + "/docs" || ''} target="_blank" className="text-blue-500 cursor-pointer text-xs ml-2"><FontAwesomeIcon icon={faExternalLinkAlt} className="mr-1 h-3 w-3" /> Docs</Link>
             </h1>
             <h1 className="text-xl mb-3 mt-12 font-bold text-gray-700">Images & Cameras</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
