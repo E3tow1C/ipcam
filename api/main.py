@@ -355,6 +355,19 @@ async def validate_token(request: Request):
         }
 
 
+@app.get("/accounts")
+async def get_all_users():
+   try:
+       accounts = user_collection.find({})
+       all_accounts = []
+       for account in accounts:
+           account['_id'] = str(account['_id'])
+           del account['password']
+           all_accounts.append(account)
+       return {"success": True, "accounts": all_accounts}
+   except Exception as e:
+       return {"success": False, "message": f"Error getting accounts: {str(e)}"}
+
 @app.post("/account/new")
 async def create_user(user: User):
     if user_collection.count_documents({"username": user.username}) > 0:
