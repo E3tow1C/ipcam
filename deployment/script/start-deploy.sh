@@ -80,13 +80,11 @@ echo
 if [ -d "$DATA_DIR" ]; then
     echo "=========================================="
     echo "✅ Data directories already exist. Skipping directory creation and permission setting."
-    echo "=========================================="
     echo
 else
     # Create directories for persistent storage
     echo "=========================================="
     echo "📁 Creating data directories..."
-    echo "=========================================="
     mkdir -p "${DATA_DIR}/mongodb/db" || { echo "❌ Failed to create MongoDB data directory"; exit 1; }
     mkdir -p "${DATA_DIR}/mongodb/configdb" || { echo "❌ Failed to create MongoDB config directory"; exit 1; }
     mkdir -p "${DATA_DIR}/minio" || { echo "❌ Failed to create MinIO directory"; exit 1; }
@@ -96,13 +94,11 @@ else
     # Set ownership to match the user ID of the container process
     echo "=========================================="
     echo "🔑 Setting ownership to match mongodb UID and GID"
-    echo "=========================================="
     sudo chown -R 999:999 ${DATA_DIR}/mongodb || { echo "❌ Failed to set ownership for MongoDB"; exit 1; }
     echo "✅ mongodb Ownership set successfully"
     echo
     echo "=========================================="
     echo "🔑 Setting ownership to match minio UID and GID"
-    echo "=========================================="
     sudo chown -R 1000:1000 ${DATA_DIR}/minio || { echo "❌ Failed to set ownership for MinIO"; exit 1; }
     echo "✅ minio Ownership set successfully"
     echo
@@ -110,7 +106,6 @@ else
     # Set more restrictive permissions for kubs-data directory
     echo "=========================================="
     echo "🔒 Setting permissions for kubes-data directory"
-    echo "=========================================="
     sudo chmod -R 777 "${DATA_DIR}" || { echo "❌ Failed to set permissions for kubes-data"; exit 1; }
     echo "✅ Permissions set success: kubes-data directory"
     echo
@@ -119,7 +114,6 @@ fi
 # Apply Kubernetes manifests
 echo "=========================================="
 echo "🚀 Applying Kubernetes manifests..."
-echo "=========================================="
 kubectl apply -f pvc.yml
 kubectl apply -f configmaps.yml
 kubectl apply -f deployments.yml
@@ -135,20 +129,19 @@ echo
 # Wait for deployments to be ready
 echo "=========================================="
 echo "⏳ Waiting for deployments to be ready..."
-echo "=========================================="
-kubectl wait --for=condition=available --timeout=300s deployment/mongodb
-kubectl wait --for=condition=available --timeout=300s deployment/minio
-kubectl wait --for=condition=available --timeout=300s deployment/fastapi
 kubectl wait --for=condition=available --timeout=300s deployment/metrics-server -n kube-system
 kubectl wait --for=condition=available --timeout=300s deployment/ingress-nginx-controller -n ingress-nginx
-# kubectl wait --for=condition=available --timeout=300s deployment/frontend
+kubectl wait --for=condition=available --timeout=300s deployment/mongodb
+kubectl wait --for=condition=available --timeout=300s deployment/minio
+kubectl wait --for=condition=available --timeout=300s deployment/frontend
+kubectl wait --for=condition=available --timeout=300s deployment/fastapi
 echo
 echo "✅ Deployment completed successfully!"
 echo ""
 echo "🔍 Access your application:"
-echo "   - API: http://fastapi.localhost:8080"
-# echo "   - Frontend: http://localhost:30000"
-echo "   - MinIO Console: http://minio.localhost:9001"
+echo "   - API: http://api.localhost:8080"
+echo "   - Frontend: http://frontend.localhost:8080"
+echo "   - MinIO Console: http://minio.localhost:8080"
 echo ""
 echo "📊 To see running pods:"
 echo "   kubectl get pods"
@@ -156,7 +149,7 @@ echo ""
 echo "🔎 To check deployment status:"
 echo "   kubectl get deployments"
 echo ""
-echo "📜 To see logs from FastAPI container:"
+echo "📜 To see logs from FastAPI deployment:"
 echo "   kubectl logs -f deployment/fastapi"
 echo ""
 echo "🛑 To stop the deployment run stop-deploy.sh in ./script directory:"
