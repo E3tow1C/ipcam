@@ -43,8 +43,5 @@ USER nextjs
 # Expose port
 EXPOSE 3000
 
-# Set environment variable for the API URL
-ENV NEXT_PUBLIC_API_URL=http://localhost:30080
-
 # Run the application
 CMD ["node", "server.js"]
