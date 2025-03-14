@@ -1,7 +1,7 @@
 'use client';
 import Sidebar from '@/components/SideBar'
-import { getAllCredentials, Credential } from '@/services/apis';
-import { faCopy, faEarDeaf, faEye, faEyeSlash, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { getAllCredentials, Credential, deleteCredential } from '@/services/apis';
+import { faCopy, faEarDeaf, faEye, faEyeSlash, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
@@ -40,6 +40,15 @@ function page() {
     fetchCredentials();
   }, [])
 
+  const handleDeleteCredential = async (id: string) => {
+    const token = Cookies.get('access_token') || '';
+    const res = await deleteCredential(id, token);
+    if (res) {
+      fetchCredentials();
+      toast.success('Credential deleted');
+    }
+  }
+
   return (
     <div className="h-screen flex flex-col">
       <Toaster />
@@ -61,8 +70,14 @@ function page() {
                 credentials.length > 0 && credentials.map((credential) => (
                   <div key={credential._id} className="bg-white w-full p-4 border rounded-lg transition-all">
                     <div className="flex flex-col mb-2">
-                      <h3 className="text-lg font-semibold text-gray-600">{credential.name}</h3>
+                      <div className='flex justify-between items-center'>
+                        <h3 className="text-lg font-semibold text-gray-600">{credential.name}</h3>
+                        <button className="bg-red-400 text-white px-2 py-1 rounded-md hover:bg-red-500 transition-all" onClick={() => handleDeleteCredential(credential._id)}>
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </button>
+                      </div>
                       <p className="text-gray-500">Host: {credential.host}</p>
+                      <p className="bg-gray-100 text-gray-500 w-max px-2 py-1 rounded-md text-sm my-2">{credential.expire ? 'Expires on ' + new Date(credential.expire).toLocaleDateString() : 'No expiry'}</p>
                     </div>
                     <div className="flex justify-between items-start">
                       <div className="px-2 py-2 w-full bg-gray-100 text-blue-500 text-sm rounded-lg overflow-hidden">
@@ -77,7 +92,11 @@ function page() {
                           showSecret[credential._id] ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />
                         }
                       </button>
-                      <button className="bg-blue-400 ml-2 text-white px-2 py-1 rounded-lg hover:bg-blue-600 transition-all" onClick={() => navigator.clipboard.writeText(credential.secret)}>
+                      <button className="bg-blue-400 ml-2 text-white px-2 py-1 rounded-lg hover:bg-blue-600 transition-all" 
+                        onClick={() => {
+                          navigator.clipboard.writeText(credential.secret)
+                          toast.success('Copied to clipboard');
+                        }}>
                         <FontAwesomeIcon icon={faCopy} />
                       </button>
                     </div>

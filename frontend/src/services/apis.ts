@@ -266,3 +266,12 @@ export const createNewCredential = async (name: string, host: string, expire?: D
     throw error;
   }
 }
+
+export const deleteCredential = async (id: string, token: string): Promise<boolean> => {
+  try {
+    const response = await fetchAPI(API_ROUTES.CREDENTIALS.BY_ID(id), 'DELETE', null, token);
+    return response.success;
+  } catch (error) {
+    throw error;
+  }
+}
