@@ -2,9 +2,10 @@
 
 import Sidebar from "@/components/SideBar";
 import { CameraData, getAllCameras, getAllImages, getFilteredImages } from "@/services/apis";
-import { faChevronDown, faImage, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faChevronDown, faCopy, faImage, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 type ImageData = {
   id: string;
@@ -22,6 +23,17 @@ export default function Home() {
   const [selectedSource, setSelectedSource] = useState<string>("all");
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
+
+  const typeName = (type: string) => {
+    switch (type) {
+      case "upload":
+        return "Uploaded Image";
+      case "capture":
+        return "Camera Capture";
+      default:
+        return "Unknown";
+    }
+  }
 
   useEffect(() => {
     setNow(new Date().toISOString().split(".")[0]);
@@ -44,6 +56,7 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col">
+      <Toaster />
       <div className="flex flex-1">
         <Sidebar />
         <div className="flex-1 px-12 py-7 md:py-9 h-svh overflow-scroll">
@@ -52,7 +65,7 @@ export default function Home() {
               Images Gallery
             </h1>
           </nav>
-          <main className="mt-8">
+          <main className="mt-8 max-w-[1200px] mx-auto">
             <div className="w-full">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
@@ -97,14 +110,37 @@ export default function Home() {
               <h2 className="text-gray-500 font-semibold mb-2 mt-4">Total Images: {images && images.length}</h2>
             </div>
             {images && images.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {images.reverse().map((img, index) => (
-                  <div key={index} className="overflow-hidden rounded shadow">
+                  <div key={index} className="overflow-hidden rounded-lg bg-white border p-2 shadow relative">
                     <img
                       src={img.image_url}
                       alt={`Image ${index + 1}`}
-                      className="w-full h-64 rounded-lg object-cover"
+                      className="w-full h-64 rounded-md object-cover cursor-pointer"
+                      onClick={() => window.open(img.image_url, '_blank')}
                     />
+                    <button className="bg-gray-50 opacity-70 text-white px-3 py-1 rounded-lg hover:opacity-100 transition-all absolute top-3 right-3"
+                      onClick={() => {
+                        navigator.clipboard.writeText(img.image_url);
+                        toast.success('Copied to clipboard');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCopy} className="text-gray-500 text-sm" />
+                    </button>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-gray-500 text-sm font-semibold">{typeName(img.type)}</p>
+                      <p className="text-gray-500 text-sm">{new Date(img.timestamp).toLocaleString()}</p>
+                    </div>
+                    {
+                      img.type === "capture" && (
+                        <div className="flex items-center mt-1 justify-between">
+                          <p className="text-gray-500 text-sm line-clamp-1">
+                            <FontAwesomeIcon icon={faCamera} className="text-gray-500 text-sm mr-2" />
+                            {(cameras.find((camera) => camera._id.toString() === img.camera_id)?.name) || "Unknown Camera"}
+                          </p>
+                        </div>
+                      )
+                    }
                   </div>
                 ))}
               </div>
