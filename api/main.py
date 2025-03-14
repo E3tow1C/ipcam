@@ -113,10 +113,11 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
-# get allowed origins from credentials collection
+
 allowed_origins = ["http://localhost:3000"]
 for origin in creadenials_collection.find():
     allowed_origins.append(origin["host"])
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -129,7 +130,7 @@ app.add_middleware(
 app.add_middleware(JWTMiddleware)
 
 
-# Add security definitions to OpenAPI schema
+
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
