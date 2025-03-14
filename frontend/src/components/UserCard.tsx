@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authLogout } from '@/services/apis';
 import toast, { Toaster } from 'react-hot-toast';
 
-function UserCard({ username = "User X" }: { username?: string }) {
+function UserCard({ username = "Admin" }: { username?: string }) {
   const router = useRouter();
   const handleLogout = async () => {
    try {

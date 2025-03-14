@@ -1,6 +1,6 @@
 import Sidebar from '@/components/SideBar'
 import { getAllAccounts } from '@/services/apis'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
 import React from 'react'
@@ -29,28 +29,19 @@ async function page() {
               </nav>
               <div className="w-[90%] mx-auto mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* display list of accounts */}
                 {accounts.length > 0 ? accounts.map((account) => (
-                <div key={account._id} className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-all">
+                <div key={account._id} className="bg-white p-6 border rounded-lg transition-all">
                   <div className="flex justify-between items-center">
                     <h3 className="text-lg font-medium text-gray-800">{account.username}</h3>
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                      User
+                      Admin
                     </span>
                   </div>
                   <div className="mt-4 flex justify-end space-x-2">
-                    <Link 
-                      href={`/accounts/${account._id}/edit`}
-                      className="text-sm px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-all"
-                    >
-                      Edit
-                    </Link>
-                    <Link 
-                      href={`/accounts/${account._id}`}
-                      className="text-sm px-3 py-1.5 bg-blue-50 text-blue-700 rounded hover:bg-blue-100 transition-all"
-                    >
-                      View
-                    </Link>
+                    <button className="px-3 py-1 bg-red-400 text-white rounded-md hover:bg-red-500 transition-all">
+                      <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
+                      Remove
+                    </button>
                   </div>
                 </div>
               )) : (

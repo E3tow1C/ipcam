@@ -16,6 +16,16 @@ export default function Home() {
         const cameraUrl = (document.getElementById('cameraUrl') as HTMLInputElement).value;
         const location = (document.getElementById('location') as HTMLInputElement).value;
 
+        let username = '';
+        let password = '';
+        let authType = '';
+
+        if (isAuth) {
+            username = (document.getElementById('username') as HTMLInputElement).value;
+            password = (document.getElementById('password') as HTMLInputElement).value;
+            authType = (document.getElementById('authType') as HTMLSelectElement).value;
+        }
+
         if (!name || !cameraUrl || !location) {
             setMessage('Please fill all fields');
             return;
@@ -24,10 +34,13 @@ export default function Home() {
         const camera = {
             name,
             url: cameraUrl,
-            location
+            location,
+            username,
+            password,
+            authType
         };
 
-        const newCamera = await addCamera(camera.name, camera.url, camera.location);
+        const newCamera = await addCamera(camera.name, camera.url, camera.location, camera.username, camera.password, camera.authType);
         if (newCamera) {
             window.location.href = '/ipcam';
         } else {
@@ -81,17 +94,17 @@ export default function Home() {
                                 {
                                     isAuth && 
                                     <>
-                                        <label className="block text-gray-500 text-sm mb-1 ml-1" htmlFor="location">Username</label>
+                                        <label className="block text-gray-500 text-sm mb-1 ml-1" htmlFor="username">Username</label>
                                         <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                            id="username" type="text" placeholder="Camera Username" disabled={!isAuth} />
+                                            id="username" type="text" placeholder="Camera Username"/>
                                         
-                                        <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Password</label>
+                                        <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="password">Password</label>
                                         <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                            id="password" type="password" placeholder="Camera Password" disabled={!isAuth} />
+                                            id="password" type="password" placeholder="Camera Password"/>
 
-                                        <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Auth Type</label>
+                                        <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="authType">Auth Type</label>
                                         <select className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-6"
-                                            id="authType" disabled={!isAuth}
+                                            id="authType"
                                         >
                                             <option value="basic">Basic</option>
                                             <option value="digest">Digest</option>

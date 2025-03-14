@@ -10,6 +10,9 @@ interface Camera {
     name: string;
     url: string;
     location: string;
+    username?: string;
+    password?: string;
+    authType?: "basic" | "digest";
 }
 
 export default function CaptureSection({ camera, cameraId }: { camera: Camera; cameraId: string }) {
@@ -18,14 +21,14 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
     const [isConfiguring, setIsConfiguring] = useState(false);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [message, setMessage] = useState<string>('');
-    const [isAuth, setIsAuth] = useState<boolean>(false);
+    const [isAuth, setIsAuth] = useState<boolean>((camera.username && camera.password) ? true : false);
     const [formData, setFormData] = useState({
         name: camera.name,
         location: camera.location,
         url: camera.url,
-        username: '',
-        password: '',
-        authType: 'basic'
+        username: camera.username || '',
+        password: camera.password || '',
+        authType: camera.authType || 'basic'
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -88,12 +91,10 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                         name: camera.name,
                                         location: camera.location,
                                         url: camera.url,
-                                        username: '',
-                                        password: '',
-                                        authType: 'basic'
+                                        username: camera.username || '',
+                                        password: camera.password || '',
+                                        authType: camera.authType || 'basic'
                                     });
-
-                                    if (isAuth) setIsAuth(false);
                                 }
                             }}
                         >

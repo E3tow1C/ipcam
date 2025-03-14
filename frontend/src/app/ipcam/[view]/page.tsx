@@ -85,7 +85,7 @@ export default function Page() {
                 className="w-full h-full object-cover rounded-xl"
               />
             </div>
-            <CaptureSection camera={camera} cameraId={view} />
+            <CaptureSection camera={camera} cameraId={view}/>
           </div>
         </div>
       </div>
