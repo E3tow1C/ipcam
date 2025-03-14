@@ -466,6 +466,18 @@ async def create_credential(credential: Credential):
     }
 
 
+@app.delete("/credential/{id}")
+async def delete_credential(id: str):
+    if len(id) != 24:
+        return {"success": False, "message": "Invalid credential id format"}
+
+    if creadenials_collection.count_documents({"_id": ObjectId(id)}) == 0:
+        return {"success": False, "message": "Credential not found"}
+
+    creadenials_collection.delete_one({"_id": ObjectId(id)})
+    return {"success": True, "message": f"Credential id: {id} deleted successfully"}
+
+
 @app.get("/protected-route")
 async def protected_route(current_user: User = Depends(get_current_user)):
     return {"message": "This is a protected route", "user": current_user["username"]}
