@@ -251,7 +251,7 @@ export type Credential = {
 export const getAllCredentials = async (token: string): Promise<Credential[]> => {
   try {
     const response = await fetchAPI(API_ROUTES.CREDENTIALS.ALL, 'GET', null, token);
-    return response;
+    return response.credentials;
   } catch (error) {
     throw error;
   }
