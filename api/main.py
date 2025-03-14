@@ -685,7 +685,7 @@ def capture_image_from_camera(camera_id: str):
 def delete_camera(camera_id: str):
     camera = camera_collection.find_one_and_delete({"_id": ObjectId(camera_id)})
     if camera:
-        return {"status": "completed", "camera": camera}
+        return {"status": "completed", "message": "Camera successfully deleted"}
     else:
         raise HTTPException(status_code=404, detail="Camera not found")
 
