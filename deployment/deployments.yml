@@ -163,7 +163,7 @@ spec:
                 ]
       containers:
         - name: fastapi
-          image: e3tow1c/ipcam-fastapi:1.2
+          image: e3tow1c/ipcam-fastapi:2.0
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:
@@ -205,26 +205,31 @@ spec:
             failureThreshold: 30
             periodSeconds: 10
             timeoutSeconds: 5
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: frontend
-# spec:
-#   selector:
-#     matchLabels:
-#       app: frontend
-#   template:
-#     metadata:
-#       labels:
-#         app: frontend
-#     spec:
-#       containers:
-#       - name: frontend
-#         image: ipcam-frontend:latest
-#         resources:
-#           limits:
-#             memory: "128Mi"
-#             cpu: "500m"
-#         ports:
-#         - containerPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: frontend
+        image: e3tow1c/frontend:0.1
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
