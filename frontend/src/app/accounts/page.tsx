@@ -51,22 +51,17 @@ function page() {
               Add Account
             </Link>
           </nav>
-          <div className="w-[90%] mx-auto mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="w-full mt-6">
+            <div className="flex flex-col gap-4">
               {accounts.length > 0 && accounts.map((account) => (
-                <div key={account._id} className="bg-white p-6 border rounded-lg transition-all">
-                  <div className="flex justify-between items-center">
+                <div key={account._id} className="bg-white flex justify-between items-center p-6 border rounded-lg transition-all">
+                  <div className="flex flex-col">
                     <h3 className="text-lg font-medium text-gray-600">{account.username}</h3>
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                      Admin
-                    </span>
+                    <p className="text-sm text-gray-400">ID: {account._id}</p>
                   </div>
-                  <div className="mt-4 flex justify-end space-x-2">
-                    <button className="px-3 py-1 bg-red-400 text-white rounded-md hover:bg-red-500 transition-all" onClick={() => handleDeleteAccount(account._id)}>
-                      <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
-                      Remove
-                    </button>
-                  </div>
+                  <button className="bg-red-400 text-white px-2 py-1 rounded-md hover:bg-red-500 transition-all" onClick={() => handleDeleteAccount(account._id)}>
+                    <FontAwesomeIcon icon={faTrashAlt}/>
+                  </button>
                 </div>
               ))}
             </div>
