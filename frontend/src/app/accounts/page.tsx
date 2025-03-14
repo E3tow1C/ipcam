@@ -16,7 +16,9 @@ function Page() {
   const handleDeleteAccount = async (id: string) => {
     const isDeleted = await deleteAccount(id, token);
     if (isDeleted) {
-      window.location.reload();
+      toast.success('Account deleted successfully');
+      const updatedAccounts = accounts.filter(account => account._id !== id);
+      setAccounts(updatedAccounts);
     }
   }
 
@@ -34,7 +36,7 @@ function Page() {
     }
 
     fetchAccounts();
-  }, [])
+  }, [token])
 
   return (
     <div className="h-screen flex flex-col">
