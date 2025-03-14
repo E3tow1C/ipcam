@@ -34,6 +34,10 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(createAuthRedirect());
     }
 
+    if (!accessToken) {
+      return NextResponse.redirect(createAuthRedirect());
+    }
+
     if (accessToken) {
       const isValidToken = await validateToken(accessToken, refreshToken);
 
