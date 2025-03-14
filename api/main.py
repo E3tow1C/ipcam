@@ -443,17 +443,27 @@ async def get_all_credentials():
 
 @app.post("/credential/new")
 async def create_credential(credential: Credential):
+    print("credential: ", credential)
     if creadenials_collection.count_documents({"name": credential.name}) > 0:
-        return {"success": False, "message": f"Credential name: {credential.name} already exists"}
-
-    creadenials_collection.insert_one(
-        {
-            "name": credential.name,
-            "host": credential.host,
-            "expire": credential.expire,
-            "secret": credential.secret,
+        return {
+            "success": False,
+            "message": f"Credential name: {credential.name} already exists",
         }
-    )
+
+    credential_doc = {
+        "name": credential.name,
+        "host": credential.host,
+        "secret": credential.secret,
+    }
+
+    if credential.expire:
+        credential_doc["expire"] = credential.expire
+
+    creadenials_collection.insert_one(credential_doc)
+    return {
+        "success": True,
+        "message": f"Credential name: {credential.name} created successfully",
+    }
 
 
 @app.get("/protected-route")
