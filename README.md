@@ -1,14 +1,14 @@
 # Supportive Ocean Observation & Data Systems
 ## Cloud Application Project
 
----
-
 ### Group Members
 - Pirapat Tarkon
 - Thepphithak Weha
 - Shine Chalermsri
 - Wisanu Rungkrathoke
 - Watcharapong Sriwong
+
+---
 
 ### Run Execution
 
