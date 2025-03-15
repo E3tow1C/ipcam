@@ -2,7 +2,7 @@
 
 import Sidebar from "@/components/SideBar";
 import { getDashboardData } from "@/services/apis";
-import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faExternalLinkAlt, faImages, faKey, faUpload, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -61,22 +61,27 @@ export default function Home() {
             <h1 className="text-xl mb-3 mt-12 font-bold text-gray-700">Images & Cameras</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="p-6 rounded-lg bg-gray-100">
+                <FontAwesomeIcon icon={faCamera} className="text-blue-500 text-3xl mb-2" />
                 <p className="text-sm text-gray-500">IP Cameras</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_cameras}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
+                <FontAwesomeIcon icon={faImages} className="text-green-500 text-3xl mb-2" />
                 <p className="text-sm text-gray-500">Total Images</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_images}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
+                <FontAwesomeIcon icon={faUpload} className="text-orange-500 text-3xl mb-2" />
                 <p className="text-sm text-gray-500">Total Uploaded Images</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_images_uploaded}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
+                <FontAwesomeIcon icon={faImages} className="text-purple-500 text-3xl mb-2" />
                 <p className="text-sm text-gray-500">Total Captured Images</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_images_captured}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
+                <FontAwesomeIcon icon={faImages} className="text-blue-500 text-3xl mb-2" />
                 <p className="text-sm text-gray-500">Today Images</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.today_images}</h2>
               </div>
@@ -85,10 +90,12 @@ export default function Home() {
             <h1 className="text-xl mb-3 mt-12 font-bold text-gray-700">Credentials & Users</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="p-6 rounded-lg bg-gray-100">
+                <FontAwesomeIcon icon={faKey} className="text-sky-500 text-3xl mb-2" />
                 <p className="text-sm text-gray-500">Total Credentials</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_credentials}</h2>
               </div>
               <div className="p-6 rounded-lg bg-gray-100">
+                <FontAwesomeIcon icon={faUser} className="text-orange-400 text-3xl mb-2" />
                 <p className="text-sm text-gray-500">Total Users</p>
                 <h2 className="mt-2 text-2xl font-bold">{metrics.total_users}</h2>
               </div>
