@@ -17,7 +17,6 @@ COPY . .
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
-ENV PORT 5001
 
 # Build the application
 RUN npm run build
