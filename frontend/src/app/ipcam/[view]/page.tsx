@@ -1,28 +1,13 @@
-/* eslint-disable @next/next/no-img-element */
-'use client';
-
+'use client'
+import { useState, useEffect } from "react";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "@/components/SideBar";
 import { CameraData, getCameraById } from "@/services/apis";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import CaptureSection from "./CaptureSection";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-
-// export async function generateMetadata({ 
-//   params 
-// }: { 
-//   params: Promise<{ view: string }> 
-// }) {
-//   const { view } = await params;
-
-//   return {
-//     title: `IP Camera View`,
-//     description: `Live view from camera ID: ${view}`,
-//   };
-// }
 
 export default function Page() {
   const params = useParams();
@@ -30,6 +15,7 @@ export default function Page() {
   const view = params?.view as string;
   const [camera, setCamera] = useState<CameraData | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   useEffect(() => {
     if (!view) router.push("/ipcam");
@@ -37,8 +23,9 @@ export default function Page() {
 
     async function fetchCamera() {
       try {
-        const resonse = await getCameraById(view);
-        setCamera(resonse);
+        const response = await getCameraById(view);
+        console.log(response);
+        setCamera(response);
       } catch {
         return notFound();
       } finally {
@@ -49,6 +36,45 @@ export default function Page() {
     fetchCamera();
   }, [router, view]);
 
+  useEffect(() => {
+
+    async function fetchImage() {
+      try {
+        if (!camera) return;
+
+        console.log(camera);
+        
+        const headers: HeadersInit = new Headers();
+        if (camera.username && camera.password) {
+          const credentials = `${camera.username}:${camera.password}`;
+          if (camera.authType === "basic") {
+            headers.set("Authorization", `Basic ${btoa(credentials)}`);
+          }
+        } else {
+          setImageSrc(camera.url);
+          return;
+        }
+
+        const response = await fetch(camera.url, {
+          method: "GET",
+          headers: headers,
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          toast.error("Camera feed not available");
+        }
+
+        const blob = await response.blob();
+        const dataUrl = URL.createObjectURL(blob);
+        setImageSrc(dataUrl);
+      } catch (error) {
+        toast.error("Camera feed not available");
+      }
+    }
+
+    fetchImage();
+  }, [camera]);
 
   if (isLoading) {
     return (
@@ -73,19 +99,28 @@ export default function Page() {
         <div className="flex-1 relative h-svh overflow-scroll">
           <nav className="w-full bg-gradient-to-br h-52 from-blue-500 to-blue-400">
             <h1 className="text-2xl px-12 ml-8 md:ml-0 py-7 md:py-9 font-bold text-white flex items-center">
-              <Link href={`/ipcam`}><FontAwesomeIcon icon={faAngleLeft} className="h-6 w-6 mr-1" />IP Cameras</Link>
-              <span className="text-gray-200 ml-2 font-normal"><span>/</span> {camera.name}</span>
+              <Link href={`/ipcam`}>
+                <FontAwesomeIcon icon={faAngleLeft} className="h-6 w-6 mr-1" />
+                IP Cameras
+              </Link>
+              <span className="text-gray-200 ml-2 font-normal">
+                <span>/</span> {camera.name}
+              </span>
             </h1>
           </nav>
           <div className="absolute left-0 right-0 top-32">
             <div className="bg-gray-800 rounded-xl w-[90%] max-w-[800px] h-[450px] mx-auto shadow-xl flex items-center justify-center text-white text-center">
-              <img
-                src={camera.url}
-                alt={camera.name}
-                className="w-full h-full object-cover rounded-xl"
-              />
+              {imageSrc ? (
+                <img
+                  src={imageSrc}
+                  alt={camera.name}
+                  className="w-full h-full object-cover rounded-xl"
+                />
+              ) : (
+                <p>Loading image...</p>
+              )}
             </div>
-            <CaptureSection camera={camera} cameraId={view}/>
+            <CaptureSection camera={camera} cameraId={view} />
           </div>
         </div>
       </div>

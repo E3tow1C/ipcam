@@ -30,7 +30,7 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
         url: camera.url,
         username: camera.username || '',
         password: camera.password || '',
-        authType: camera.authType || 'basic'
+        authType: camera.authType || ''
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -218,7 +218,18 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                             />
 
                             <div className="flex items-center mt-4 ml-1 mb-4 gap-2">
-                                <input type="checkbox" id="auth" name="auth" value="auth" onChange={() => setIsAuth(!isAuth)} checked={isAuth} />
+                                <input type="checkbox" id="auth" name="auth" value="auth" onChange={() => {
+                                    setIsAuth(!isAuth)
+                                    if (isAuth) {
+                                        setFormData({
+                                            ...formData,
+                                            username: '',
+                                            password: '',
+                                            authType: ''
+                                        });
+                                    }
+                                }} 
+                                    checked={isAuth} />
                                 <label htmlFor="auth" className="text-gray-500 select-none"> Camera Authentication</label>
                             </div>
 

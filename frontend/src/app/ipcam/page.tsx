@@ -6,7 +6,7 @@ import { CameraData, getAllCameras } from "@/services/apis";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faLock, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 
 export default function Home() {
@@ -42,11 +42,20 @@ export default function Home() {
                 cameras.map((camera, index) => (
                   <Link key={index} className="bg-gray-50 border rounded-xl hover:bg-gray-100 transition-all p-4" href={`/ipcam/${camera._id}`}>
                     <div className="bg-gray-800 rounded-xl shadow-xl flex items-center justify-center text-white text-center relative">
-                      <img
-                        src={camera.url}
-                        alt="ipcam"
-                        className="w-full h-56 object-cover rounded-lg"
-                      />
+                      {
+                        camera.authType ? (
+                          <div className="w-full h-56 flex items-center text-gray-300 justify-center">
+                            <FontAwesomeIcon icon={faCamera} className="text-4xl" />
+                            <p className="ml-2">Protected Camera</p>
+                          </div>
+                        ) : (
+                          <img
+                            src={camera.url}
+                            alt="ipcam"
+                            className="w-full h-56 object-cover rounded-lg"
+                          />
+                        )
+                      }
                       <div className="absolute top-0 left-0 right-0 flex justify-between p-2">
 
                       </div>
