@@ -56,9 +56,6 @@ export default function Home() {
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="url">Service URL/IP Address</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                     id="url" type="text" placeholder="example: https://example.com" />
-                    <p className="text-xs text-gray-400 ml-1 mt-2">
-                      Note: The URL/IP address will be used to configure Cross-Origin Resource Sharing (CORS) policies for secure API access
-                    </p>
 
                     <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="exp">Credentials Expiry Date</label>
                     <input className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:opacity-50"
