@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:latest
+    image: mongo:4.4
     container_name: mongodb
     restart: unless-stopped
     environment:
@@ -49,7 +49,7 @@ services:
     build: ./frontend
     container_name: frontend
     ports:
-      - "3000:3000"
+      - "5001:5001"
     env_file:
       - ./frontend/.env
     restart: always
