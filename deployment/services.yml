@@ -23,7 +23,7 @@ spec:
     name: api
   - port: 9001
     targetPort: 9001
-    nodePort: 9001
+    nodePort: 30000
     name: console
 ---
 apiVersion: v1
@@ -37,7 +37,7 @@ spec:
   ports:
   - port: 8000
     targetPort: 8000
-    nodePort: 8080
+    nodePort: 30001
 ---
 apiVersion: v1
 kind: Service
@@ -51,5 +51,5 @@ spec:
   - protocol: TCP
     port: 5001
     targetPort: 5001
-    nodePort: 5001
+    nodePort: 30002
 

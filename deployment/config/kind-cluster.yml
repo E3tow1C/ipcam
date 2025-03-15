@@ -9,13 +9,13 @@ nodes:
     #       kubeletExtraArgs:
     #         node-labels: "ingress-ready=true"
     extraPortMappings:
-        - containerPort: 5001
+        - containerPort: 30002
           hostPort: 5001
           protocol: TCP
-        - containerPort: 8080
+        - containerPort: 30001
           hostPort: 8080
           protocol: TCP
-        - containerPort: 9001
+        - containerPort: 30000
           hostPort: 9001
           protocol: TCP
     extraMounts:
