@@ -13,8 +13,6 @@ export async function middleware(request: NextRequest) {
 
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
-  console.log('accessToken:', accessToken);
-  console.log('refreshToken:', refreshToken);
 
   const createAuthRedirect = () => {
     const url = new URL(`/auth`, request.url);
@@ -65,7 +63,6 @@ async function validateToken(accessToken?: string, refreshToken?: string): Promi
   if (!accessToken) return false;
 
   try {
-    console.log('Validating token with url:', API_ROUTES.AUTH.VALIDATE);
     const validateResponse = await fetch(API_ROUTES.AUTH.VALIDATE, {
       credentials: 'include',
       headers: {
