@@ -207,10 +207,10 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                 Camera Configuration
                             </p>
 
-                            <label className="block text-gray-500 text-sm mb-1 mt-2 ml-1" htmlFor="cameraUrl">Camera URL</label>
+                            <label className="block text-gray-500 text-sm mb-1 mt-2 ml-1" htmlFor="url">Camera URL</label>
                             <input
                                 className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                id="cameraUrl"
+                                id="url"
                                 type="text"
                                 placeholder="Camera URL or IP"
                                 value={formData.url}
