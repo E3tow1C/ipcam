@@ -3,3 +3,5 @@
 api/.env
 api/.api.env
 api/example.txt
+certs/_wildcard.localhost+3-key.pem
+certs/_wildcard.localhost+3.pem
