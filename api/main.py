@@ -292,10 +292,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 async def logout():
     response = JSONResponse(content={"success": True})
     response.delete_cookie(
-        key="refresh_token", path="/", httponly=True, secure=True, samesite="none"
+        key="refresh_token", path="/", httponly=True, secure=False, samesite="lax"
     )
     response.delete_cookie(
-        key="access_token", path="/", secure=True, samesite="none"
+        key="access_token", path="/", secure=False, samesite="lax"
     )
 
     return response
