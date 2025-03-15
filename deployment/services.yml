@@ -43,7 +43,7 @@ spec:
   selector:
     app: frontend
   ports:
-  - protocl: TCP
+  - protocol: TCP
     port: 3000
     targetPort: 5001
 
