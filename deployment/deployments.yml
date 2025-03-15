@@ -222,7 +222,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: frontend
-        image: e3tow1c/frontend:1.4
+        image: e3tow1c/frontend:1.5
         imagePullPolicy: IfNotPresent
         resources:
           requests:
@@ -235,4 +235,4 @@ spec:
           - configMapRef:
               name: frontend-config
         ports:
-        - containerPort: 3000
+        - containerPort: 5001

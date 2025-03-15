@@ -45,5 +45,5 @@ spec:
   ports:
   - protocol: TCP
     port: 5001
-    targetPort: 3000
+    targetPort: 5001
 
