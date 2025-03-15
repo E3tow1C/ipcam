@@ -62,6 +62,9 @@ export default function Page() {
         });
 
         if (!response.ok) {
+          if (toast) {
+            toast.dismiss();
+          }
           toast.error("Camera feed not available");
         }
 
@@ -69,6 +72,9 @@ export default function Page() {
         const dataUrl = URL.createObjectURL(blob);
         setImageSrc(dataUrl);
       } catch (error) {
+        if (toast) {
+          toast.dismiss();
+        }
         toast.error("Camera feed not available");
       }
     }
