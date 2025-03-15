@@ -14,10 +14,6 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
-  // Debug: Log all cookies to see what's available
-  const allCookies = request.cookies.getAll();
-  console.log("All available cookies:", allCookies);
-
   const createAuthRedirect = () => {
     const url = new URL(`/auth`, request.url);
     url.searchParams.set('redirect', path);
@@ -25,42 +21,32 @@ export async function middleware(request: NextRequest) {
   };
 
   if (isPublicPath && accessToken) {
-    const isValidToken = await validateToken(accessToken);
+    const isValidToken = await validateToken(accessToken, refreshToken);
     if (isValidToken) {
-      const response = NextResponse.redirect(new URL('/', request.url));
-      response.headers.set(`x-middleware-cache`, `no-cache`);
-      return response;
+      return NextResponse.redirect(new URL('/', request.url));
     }
 
-    const response = NextResponse.next();
-    response.headers.set(`x-middleware-cache`, `no-cache`);
-    return response;
+    return NextResponse.next();
   }
 
   if (!isPublicPath) {
     if (!accessToken && !refreshToken) {
-      const response = NextResponse.redirect(createAuthRedirect());
-      response.headers.set(`x-middleware-cache`, `no-cache`);
-      return response;
+      return NextResponse.redirect(createAuthRedirect());
     }
 
     if (!accessToken) {
-      const response = NextResponse.redirect(createAuthRedirect());
-      response.headers.set(`x-middleware-cache`, `no-cache`);
-      return response;
+      return NextResponse.redirect(createAuthRedirect());
     }
 
     if (accessToken) {
-      const isValidToken = await validateToken(accessToken);
+      const isValidToken = await validateToken(accessToken, refreshToken);
 
       if (isValidToken) {
-        const response = NextResponse.next();
-        response.headers.set(`x-middleware-cache`, `no-cache`);
-        return response;
+        return NextResponse.next();
       }
 
       if (refreshToken) {
-        const refreshResult = await refreshTokens(refreshToken);
+        const refreshResult = await refreshTokens(accessToken, refreshToken);
         if (refreshResult.success) {
           return refreshResult.response;
         }
@@ -70,19 +56,17 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const response = NextResponse.next();
-  response.headers.set(`x-middleware-cache`, `no-cache`);
-  return response;
+  return NextResponse.next();
 }
 
-async function validateToken(accessToken?: string): Promise<boolean> {
+async function validateToken(accessToken?: string, refreshToken?: string): Promise<boolean> {
   if (!accessToken) return false;
 
   try {
     const validateResponse = await fetch(API_ROUTES.AUTH.VALIDATE, {
       credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        Cookie: `access_token=${accessToken}${refreshToken ? `; refresh_token=${refreshToken}` : ''}`
       }
     });
 
@@ -94,20 +78,21 @@ async function validateToken(accessToken?: string): Promise<boolean> {
   }
 }
 
-async function refreshTokens(refreshToken?: string): Promise<{ success: boolean, response?: NextResponse }> {
+async function refreshTokens(accessToken?: string, refreshToken?: string): Promise<{ success: boolean, response?: NextResponse }> {
   if (!refreshToken) return { success: false };
 
   try {
     const refreshResponse = await fetch(API_ROUTES.AUTH.REFRESH, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${refreshToken}`,
+        Cookie: `refresh_token=${refreshToken}${accessToken ? `; access_token=${accessToken}` : ''}`
       },
+      credentials: 'include',
     });
 
     if (refreshResponse.ok) {
       const response = NextResponse.next();
-      response.headers.set(`x-middleware-cache`, `no-cache`);
+
       const setCookieHeader = refreshResponse.headers.get('Set-Cookie');
       if (setCookieHeader) {
         response.headers.set('Set-Cookie', setCookieHeader);
