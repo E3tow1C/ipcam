@@ -25,26 +25,36 @@ export async function middleware(request: NextRequest) {
   if (isPublicPath && accessToken) {
     const isValidToken = await validateToken(accessToken, refreshToken);
     if (isValidToken) {
-      return NextResponse.redirect(new URL('/', request.url));
+      const response = NextResponse.redirect(new URL('/', request.url));
+      response.headers.set(`x-middleware-cache`, `no-cache`);
+      return response;
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set(`x-middleware-cache`, `no-cache`);
+    return response;
   }
 
   if (!isPublicPath) {
     if (!accessToken && !refreshToken) {
-      return NextResponse.redirect(createAuthRedirect());
+      const response = NextResponse.redirect(createAuthRedirect());
+      response.headers.set(`x-middleware-cache`, `no-cache`);
+      return response;
     }
 
     if (!accessToken) {
-      return NextResponse.redirect(createAuthRedirect());
+      const response = NextResponse.redirect(createAuthRedirect());
+      response.headers.set(`x-middleware-cache`, `no-cache`);
+      return response;
     }
 
     if (accessToken) {
       const isValidToken = await validateToken(accessToken, refreshToken);
 
       if (isValidToken) {
-        return NextResponse.next();
+        const response = NextResponse.next();
+        response.headers.set(`x-middleware-cache`, `no-cache`);
+        return response;
       }
 
       if (refreshToken) {
@@ -58,7 +68,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set(`x-middleware-cache`, `no-cache`);
+  return response;
 }
 
 async function validateToken(accessToken?: string, refreshToken?: string): Promise<boolean> {
@@ -94,7 +106,7 @@ async function refreshTokens(accessToken?: string, refreshToken?: string): Promi
 
     if (refreshResponse.ok) {
       const response = NextResponse.next();
-
+      response.headers.set(`x-middleware-cache`, `no-cache`);
       const setCookieHeader = refreshResponse.headers.get('Set-Cookie');
       if (setCookieHeader) {
         response.headers.set('Set-Cookie', setCookieHeader);
