@@ -336,8 +336,8 @@ async def refresh_access_token(request: Request):
         key="access_token",
         value=new_access_token,
         path="/",
-        # secure=True,
-        # domain=".localhost",
+        secure=True,
+        domain="api.localhost",
     )
 
     response.set_cookie(
@@ -345,8 +345,8 @@ async def refresh_access_token(request: Request):
         value=new_refresh_token,
         httponly=True,
         path="/",
-        # secure=True,
-        # domain=".localhost",
+        secure=True,
+        domain="api.localhost",
     )
 
     return response
