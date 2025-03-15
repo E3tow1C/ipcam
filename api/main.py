@@ -69,27 +69,36 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/auth/validate",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
+            is_api_key = False
 
-            if token:
-                if token.startswith("Bearer "):
-                    token = token.split(" ")[1]
-
-                if token.count(".") == 2:
-                    try:
-                        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-                        request.state.username = payload.get("sub")
-                    except JWTError:
-                        return JSONResponse(
-                            status_code=401, content={"detail": "Invalid token"}
-                        )
-                else:
-                    credential = creadenials_collection.find_one({"secret": token})
-                    if credential:
-                        request.state.username = credential["name"]
+            if token and token.startswith("Bearer"):
+                token = token.split(" ")[1]
+                
             else:
+                token = request.cookies.get("access_token")
+
+            if not token:
                 return JSONResponse(
                     status_code=401, content={"detail": "Not authenticated"}
                 )
+            
+            if token.count('.') == 2:
+                try:
+                    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+                    request.state.username = payload.get("sub")
+                except JWTError:
+                    return JSONResponse(
+                        status_code=401, content={"detail": "Invalid token"}
+                    )
+            else:
+                credential = creadenials_collection.find_one({"secret": token})
+                if credential:
+                    request.state.username = credential["name"]
+                
+                else:
+                    return JSONResponse(
+                        status_code=401, content={"detail": "Invalid token"}
+                    )
 
         response = await call_next(request)
         return response
@@ -118,13 +127,7 @@ app = FastAPI(
 )
 
 
-allowed_origins = [
-    "http://localhost:3000",
-    "http://frontend.localhost:8080",
-    "https://frontend.localhost",
-    "http://localhost:5001",
-    "http://10.161.112.137:5001",
-]
+allowed_origins = ["http://localhost:3000", "http://frontend.localhost:8080", "https://frontend.localhost", "http://localhost:5001", "http://10.161.112.137:5001"]
 for origin in creadenials_collection.find():
     allowed_origins.append(origin["host"])
 
@@ -303,7 +306,9 @@ async def logout():
     response.delete_cookie(
         key="refresh_token", path="/", httponly=True, secure=False, samesite="lax"
     )
-    response.delete_cookie(key="access_token", path="/", secure=False, samesite="lax")
+    response.delete_cookie(
+        key="access_token", path="/", secure=False, samesite="lax"
+    )
 
     return response
 
