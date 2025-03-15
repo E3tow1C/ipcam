@@ -62,6 +62,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
         if request.url.path not in [
             "/",
             "/auth/login",
+            "/auth/logout",
             "/docs",
             "/openapi.json",
             "/auth/refresh",
