@@ -40,4 +40,5 @@ metadata:
 data:
   SERVER_SIDE_URL: "http://fastapi:8000"
   NEXT_PUBLIC_API_URL: "http://localhost:8080"
+  PORT: "80"
 

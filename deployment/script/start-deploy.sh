@@ -154,7 +154,6 @@ kubectl apply -f services.yml
 kubectl apply -f components.yaml
 kubectl apply -f scaling.yml
 # kubectl apply -f ingress-controller.yml
-# kubectl apply -f frontend-deployment.yml
 echo "✅ Kubernetes manifests applied successfully"
 echo
 
