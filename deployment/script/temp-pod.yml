@@ -1,0 +1,14 @@
+# filepath: /Users/care/cloudapp/ipcam/deployment/temp-pod.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: temp-pod
+spec:
+  containers:
+  - name: temp-container
+    image: appropriate/curl
+    command: ["sleep", "3600"]
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
