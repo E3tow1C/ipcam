@@ -71,7 +71,7 @@ export default function Page() {
         const blob = await response.blob();
         const dataUrl = URL.createObjectURL(blob);
         setImageSrc(dataUrl);
-      } catch (error) {
+      } catch {
         if (toast) {
           toast.dismiss();
         }
