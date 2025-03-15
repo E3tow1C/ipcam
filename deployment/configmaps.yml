@@ -39,4 +39,5 @@ metadata:
   name: frontend-config
 data:
   SERVER_SIDE_URL: "http://fastapi:8000"
+  NEXT_PUBLIC_API_URL: "http://api.localhost:8080"
 
