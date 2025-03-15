@@ -163,7 +163,7 @@ spec:
                 ]
       containers:
         - name: fastapi
-          image: e3tow1c/ipcam-fastapi:0.6
+          image: e3tow1c/ipcam-fastapi:0.7
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:
@@ -222,7 +222,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: frontend
-        image: e3tow1c/frontend:0.3
+        image: e3tow1c/frontend:0.5
         imagePullPolicy: IfNotPresent
         resources:
           requests:
