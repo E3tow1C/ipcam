@@ -517,7 +517,7 @@ async def protected_route(current_user: User = Depends(get_current_user)):
 
 @app.get("/")
 def read_root():
-    return {"Hello": "API IS RUNNING"}
+    return {"Hello": "API IS RUNNING VERSION 1.8"}
 
 
 @app.post("/upload")
