@@ -18,36 +18,36 @@ if [ "$(basename "$SHELL")" != "$SHELL_TO_USE" ]; then
 fi
 
 # Add this section right after the OS detection
-if [ "$SHELL_TO_USE" = "bash" ]; then
-  # Ubuntu setup
-  if ! command -v mkcert &> /dev/null; then
-    echo "📦 Installing mkcert..."
-    sudo apt update
-    sudo apt install -y libnss3-tools wget
-    wget -O mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
-    chmod +x mkcert
-    sudo mv mkcert /usr/local/bin/
-  fi
+# if [ "$SHELL_TO_USE" = "bash" ]; then
+#   # Ubuntu setup
+#   if ! command -v mkcert &> /dev/null; then
+#     echo "📦 Installing mkcert..."
+#     sudo apt update
+#     sudo apt install -y libnss3-tools wget
+#     wget -O mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
+#     chmod +x mkcert
+#     sudo mv mkcert /usr/local/bin/
+#   fi
   
-  # Create certificates directory
-  mkdir -p ~/cloudapp/ipcam/certs
-  cd ~/cloudapp/ipcam/certs
+#   # Create certificates directory
+#   mkdir -p ~/cloudapp/ipcam/certs
+#   cd ~/cloudapp/ipcam/certs
   
-  # Install local CA if not already installed
-  if [ ! -f "$(mkcert -CAROOT)/rootCA.pem" ]; then
-    echo "🔒 Installing local CA..."
-    mkcert -install
-  fi
+#   # Install local CA if not already installed
+#   if [ ! -f "$(mkcert -CAROOT)/rootCA.pem" ]; then
+#     echo "🔒 Installing local CA..."
+#     mkcert -install
+#   fi
   
-  # Generate certificates if they don't exist
-  if [ ! -f "_wildcard.localhost+3.pem" ]; then
-    echo "🔑 Generating certificates..."
-    mkcert "*.localhost" localhost 127.0.0.1 ::1
-  fi
+#   # Generate certificates if they don't exist
+#   if [ ! -f "_wildcard.localhost+3.pem" ]; then
+#     echo "🔑 Generating certificates..."
+#     mkcert "*.localhost" localhost 127.0.0.1 ::1
+#   fi
   
-  # Return to the deployment directory
-  cd ~/cloudapp/ipcam/deployment
-fi
+#   # Return to the deployment directory
+#   cd ~/cloudapp/ipcam/deployment
+# fi
 
 # Exit on error
 set -e
@@ -150,30 +150,38 @@ kubectl apply -f pvc.yml
 kubectl apply -f configmaps.yml
 kubectl apply -f deployments.yml
 kubectl apply -f services.yml
-kubectl apply -f ingress.yml
+# kubectl apply -f ingress.yml
 kubectl apply -f components.yaml
 kubectl apply -f scaling.yml
-kubectl apply -f ingress-controller.yml
+# kubectl apply -f ingress-controller.yml
 # kubectl apply -f frontend-deployment.yml
 echo "✅ Kubernetes manifests applied successfully"
 echo
 
 # Create a certificate secret for localhost
-echo "creating certificate secret for localhost"
-cd ~/cloudapp/ipcam/certs
-kubectl create namespace cert-manager
-kubectl create secret tls localhost-tls --cert=_wildcard.localhost+3.pem --key=_wildcard.localhost+3-key.pem -n cert-manager
-echo "✅ Certificate secret created successfully"
-echo
+# echo "creating certificate secret for localhost"
+# cd ~/cloudapp/ipcam/certs
+# kubectl create secret tls localhost-tls --cert=_wildcard.localhost+3.pem --key=_wildcard.localhost+3-key.pem
+# echo "✅ Certificate secret created successfully"
+# echo
 # Wait for deployments to be ready
 echo "=========================================="
 echo "⏳ Waiting for deployments to be ready..."
 kubectl wait --for=condition=available --timeout=300s deployment/metrics-server -n kube-system
-kubectl wait --for=condition=available --timeout=300s deployment/ingress-nginx-controller -n ingress-nginx
+# kubectl wait --for=condition=available --timeout=300s deployment/ingress-nginx-controller -n ingress-nginx
 kubectl wait --for=condition=available --timeout=300s deployment/mongodb
 kubectl wait --for=condition=available --timeout=300s deployment/minio
 kubectl wait --for=condition=available --timeout=300s deployment/frontend
 kubectl wait --for=condition=available --timeout=300s deployment/fastapi
+
+# Forward ports to access the services
+# echo "=========================================="
+# echo "🔗 Forwarding ports to access the services..."
+# kubectl port-forward service/minio 9001:9001 
+# kubectl port-forward service/frontend 3000:3000 
+# kubectl port-forward service/fastapi 8080:8000 
+# echo "✅ Ports forwarded successfully"
+
 echo
 echo "✅ Deployment completed successfully!"
 echo ""

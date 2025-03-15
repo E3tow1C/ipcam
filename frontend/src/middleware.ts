@@ -14,9 +14,9 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
-  const baseUrl = process.env.SERVER_SIDE_URL;
-
-  await fetch(baseUrl + `?access_token=${accessToken}, refresh_token=${refreshToken}`);
+  // Debug: Log all cookies to see what's available
+  const allCookies = request.cookies.getAll();
+  console.log("All available cookies:", allCookies);
 
   const createAuthRedirect = () => {
     const url = new URL(`/auth`, request.url);
@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
       }
 
       if (refreshToken) {
-        const refreshResult = await refreshTokens(accessToken, refreshToken);
+        const refreshResult = await refreshTokens(refreshToken);
         if (refreshResult.success) {
           return refreshResult.response;
         }
@@ -94,16 +94,15 @@ async function validateToken(accessToken?: string): Promise<boolean> {
   }
 }
 
-async function refreshTokens(accessToken?: string, refreshToken?: string): Promise<{ success: boolean, response?: NextResponse }> {
+async function refreshTokens(refreshToken?: string): Promise<{ success: boolean, response?: NextResponse }> {
   if (!refreshToken) return { success: false };
 
   try {
     const refreshResponse = await fetch(API_ROUTES.AUTH.REFRESH, {
       method: 'GET',
       headers: {
-        Cookie: `refresh_token=${refreshToken}${accessToken ? `; access_token=${accessToken}` : ''}`
+        'Authorization': `Bearer ${refreshToken}`,
       },
-      credentials: 'include',
     });
 
     if (refreshResponse.ok) {

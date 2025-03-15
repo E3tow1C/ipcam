@@ -4,19 +4,19 @@ metadata:
   name: fastapi-ingress
   annotations:
     spec.ingressClassName: "nginx"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, http://frontend.localhost:8080, http://localhost:8080"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, http://frontend.localhost:8080, http://localhost:8080, https://frontend.localhost"
     nginx.ingress.kubernetes.io/cors-allow-methods: "*"
     nginx.ingress.kubernetes.io/cors-allow-headers: "*"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/preserve-host: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
-  tls:
-    - hosts:
-        - api.localhost
-      secretName: localhost-tls
+  # tls:
+  #   - hosts:
+  #       - api.localhost
+  #     secretName: localhost-tls
   rules:
     - host: api.localhost
       http:
@@ -38,9 +38,13 @@ metadata:
   annotations:
     spec.ingressClassName: "nginx"
     nginx.ingress.kubernetes.io/preserve-host: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
+  # tls:
+  # - hosts:
+  #   - frontend.localhost
+  #   secretName: localhost-tls
   rules:
   - host: frontend.localhost
     http:
@@ -58,13 +62,17 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: minio-console-ingress
-  annotations:
-    spec.ingressClassName: "nginx"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  # annotations:
+  #   spec.ingressClassName: "nginx"
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  #   nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
+  # tls:
+  #   - hosts:
+  #       - minio.localhost.com
+  #     secretName: localhost-tls
   rules:
-    - host: minio.localhost
+    - host: minio.localhost.com
       http:
         paths:
           - path: /
