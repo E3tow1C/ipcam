@@ -7,6 +7,6 @@ export const options = {
 };
 
 export default function () {
-  http.get('http://api.localhost:8080/images');
+  http.get('http://localhost:8080/');
   sleep(1);
 }
