@@ -14,6 +14,7 @@ kind: Service
 metadata:
   name: minio
 spec:
+  type: NodePort
   selector:
     app: minio
   ports:
@@ -30,6 +31,7 @@ kind: Service
 metadata:
   name: fastapi
 spec:
+  type: NodePort
   selector:
     app: fastapi
   ports:
@@ -42,6 +44,7 @@ kind: Service
 metadata:
   name: frontend
 spec:
+  type: NodePort
   selector:
     app: frontend
   ports:
