@@ -12,7 +12,7 @@ data:
   MINIO_ACCESS_KEY: "root"
   MINIO_SECRET_KEY: "password"
   BUCKET_NAME: "images"
-  API_EXTERNAL_URL: "http://localhost:8080"
+  API_EXTERNAL_URL: "http://10.161.112.137:8080"
   FIRST_USER: "admin"
   FIRST_USER_PASSWORD: "admin1234"
 
@@ -39,5 +39,5 @@ metadata:
   name: frontend-config
 data:
   SERVER_SIDE_URL: "http://fastapi:8000"
-  NEXT_PUBLIC_API_URL: "http://localhost:8080"
+  NEXT_PUBLIC_API_URL: "http://10.161.112.137:8080"
 
