@@ -14,7 +14,9 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
-  await fetch("http://fastapi:8000/" + `?access_token=${accessToken}, refresh_token=${refreshToken}`);
+  const baseUrl = process.env.SERVER_SIDE_URL;
+
+  await fetch(baseUrl + `?access_token=${accessToken}, refresh_token=${refreshToken}`);
 
   const createAuthRedirect = () => {
     const url = new URL(`/auth`, request.url);
