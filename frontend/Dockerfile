@@ -44,4 +44,4 @@ USER nextjs
 EXPOSE 5001
 
 # Run the application
-CMD ["node", "server.js"]
+CMD ["npm", "run", "start"]
