@@ -10,12 +10,13 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/preserve-host: "true"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_cookie_path / "/";
-      proxy_cookie_domain api.localhost localhost;
-      more_set_headers "Access-Control-Allow-Origin: $http_origin";
-      more_set_headers "Access-Control-Allow-Credentials: true";
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
+  tls:
+    - hosts:
+        - api.localhost
+      secretName: localhost-tls
   rules:
     - host: api.localhost
       http:
@@ -35,7 +36,10 @@ metadata:
   labels:
     name: frontend-ingress
   annotations:
+    spec.ingressClassName: "nginx"
     nginx.ingress.kubernetes.io/preserve-host: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   rules:
   - host: frontend.localhost
@@ -56,6 +60,8 @@ metadata:
   name: minio-console-ingress
   annotations:
     spec.ingressClassName: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   rules:
     - host: minio.localhost

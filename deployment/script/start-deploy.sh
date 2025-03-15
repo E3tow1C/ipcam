@@ -17,6 +17,38 @@ if [ "$(basename "$SHELL")" != "$SHELL_TO_USE" ]; then
   echo "using $SHELL_TO_USE"
 fi
 
+# Add this section right after the OS detection
+if [ "$SHELL_TO_USE" = "bash" ]; then
+  # Ubuntu setup
+  if ! command -v mkcert &> /dev/null; then
+    echo "📦 Installing mkcert..."
+    sudo apt update
+    sudo apt install -y libnss3-tools wget
+    wget -O mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
+    chmod +x mkcert
+    sudo mv mkcert /usr/local/bin/
+  fi
+  
+  # Create certificates directory
+  mkdir -p ~/cloudapp/ipcam/certs
+  cd ~/cloudapp/ipcam/certs
+  
+  # Install local CA if not already installed
+  if [ ! -f "$(mkcert -CAROOT)/rootCA.pem" ]; then
+    echo "🔒 Installing local CA..."
+    mkcert -install
+  fi
+  
+  # Generate certificates if they don't exist
+  if [ ! -f "_wildcard.localhost+3.pem" ]; then
+    echo "🔑 Generating certificates..."
+    mkcert "*.localhost" localhost 127.0.0.1 ::1
+  fi
+  
+  # Return to the deployment directory
+  cd ~/cloudapp/ipcam/deployment
+fi
+
 # Exit on error
 set -e
 
@@ -126,6 +158,13 @@ kubectl apply -f ingress-controller.yml
 echo "✅ Kubernetes manifests applied successfully"
 echo
 
+# Create a certificate secret for localhost
+echo "creating certificate secret for localhost"
+cd ~/cloudapp/ipcam/certs
+kubectl create namespace cert-manager
+kubectl create secret tls localhost-tls --cert=_wildcard.localhost+3.pem --key=_wildcard.localhost+3-key.pem -n cert-manager
+echo "✅ Certificate secret created successfully"
+echo
 # Wait for deployments to be ready
 echo "=========================================="
 echo "⏳ Waiting for deployments to be ready..."
@@ -139,9 +178,9 @@ echo
 echo "✅ Deployment completed successfully!"
 echo ""
 echo "🔍 Access your application:"
-echo "   - API: http://api.localhost:8080"
-echo "   - Frontend: http://frontend.localhost:8080"
-echo "   - MinIO Console: http://minio.localhost:8080"
+echo "   - API: https://api.localhost"
+echo "   - Frontend: https://frontend.localhost" 
+echo "   - MinIO Console: https://minio.localhost"
 echo ""
 echo "📊 To see running pods:"
 echo "   kubectl get pods"

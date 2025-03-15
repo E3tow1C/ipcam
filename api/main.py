@@ -114,7 +114,7 @@ app = FastAPI(
 )
 
 
-allowed_origins = ["http://localhost:3000", "http://frontend.localhost:8080"]
+allowed_origins = ["http://localhost:3000", "http://frontend.localhost:8080", "https://frontend.localhost"]
 for origin in creadenials_collection.find():
     allowed_origins.append(origin["host"])
 
@@ -272,7 +272,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         value=access_token,
         path="/",
         secure=True,
-        domain=".localhost",
         samesite="none",
     )
 
@@ -282,7 +281,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         httponly=True,
         path="/",
         secure=True,
-        domain=".localhost",
         samesite="none",
     )
 
@@ -293,10 +291,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 async def logout():
     response = JSONResponse(content={"success": True})
     response.delete_cookie(
-        key="refresh_token", path="/", httponly=True, secure=True
+        key="refresh_token", path="/", httponly=True, secure=True, samesite="none"
     )
     response.delete_cookie(
-        key="access_token", path="/", secure=True
+        key="access_token", path="/", secure=True, samesite="none"
     )
 
     return response
@@ -339,7 +337,6 @@ async def refresh_access_token(request: Request):
         value=new_access_token,
         path="/",
         secure=True,
-        domain=".localhost",
         samesite="none",
     )
 
@@ -349,7 +346,6 @@ async def refresh_access_token(request: Request):
         httponly=True,
         path="/",
         secure=True,
-        domain=".localhost",
         samesite="none",
     )
 
