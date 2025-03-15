@@ -273,6 +273,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         path="/",
         secure=True,
         domain=".localhost",
+        samesite="none",
     )
 
     response.set_cookie(
@@ -282,6 +283,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         path="/",
         secure=True,
         domain=".localhost",
+        samesite="none",
     )
 
     return response
@@ -338,6 +340,7 @@ async def refresh_access_token(request: Request):
         path="/",
         secure=True,
         domain=".localhost",
+        samesite="none",
     )
 
     response.set_cookie(
@@ -347,6 +350,7 @@ async def refresh_access_token(request: Request):
         path="/",
         secure=True,
         domain=".localhost",
+        samesite="none",
     )
 
     return response
