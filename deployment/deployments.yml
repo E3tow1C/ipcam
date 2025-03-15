@@ -222,7 +222,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: frontend
-        image: e3tow1c/frontend:1.5
+        image: e3tow1c/frontend:1.6
         imagePullPolicy: IfNotPresent
         resources:
           requests:
