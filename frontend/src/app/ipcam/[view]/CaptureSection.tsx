@@ -79,9 +79,9 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
             name: formData.name,
             url: formData.url,
             location: formData.location,
-            username: formData.username,
-            password: formData.password,
-            authType: formData.authType
+            username: isAuth ? formData.username : '',
+            password: isAuth ? formData.password : '',
+            authType: isAuth ? formData.authType : ''
         }
 
         const updatedCamera = await updateCamera(cameraId, newCameraData.name, newCameraData.url, newCameraData.location, newCameraData.username, newCameraData.password, newCameraData.authType);
