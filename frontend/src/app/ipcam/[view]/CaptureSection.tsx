@@ -2,7 +2,7 @@
 "use client";
 import Modal from "@/components/Modal";
 import { captureCameraImage, deleteCamera, updateCamera } from "@/services/apis";
-import { faCircleNotch, faCameraAlt, faPen, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCircleNotch, faCameraAlt, faPen, faCheck, faXmark, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -171,8 +171,7 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                             }
                         </button>
                         <button className="bg-red-400 text-white px-3 py-2 rounded-md disabled:opacity-70" onClick={() => setIsOpen(true)}>
-                            <FontAwesomeIcon icon={faXmark} className="mr-2" />
-                            Delete
+                            <FontAwesomeIcon icon={faTrashAlt} />
                         </button>
                     </div>
                 </div>
