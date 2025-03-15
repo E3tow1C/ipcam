@@ -17,6 +17,7 @@ COPY . .
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
+ENV PORT 5001
 
 # Build the application
 RUN npm run build
@@ -41,7 +42,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 # Expose port
-EXPOSE 3000
+EXPOSE 5001
 
 # Run the application
 CMD ["node", "server.js"]
