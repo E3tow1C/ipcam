@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   };
 
   if (isPublicPath && accessToken) {
-    const isValidToken = await validateToken(accessToken, refreshToken);
+    const isValidToken = await validateToken(accessToken);
     if (isValidToken) {
       const response = NextResponse.redirect(new URL('/', request.url));
       response.headers.set(`x-middleware-cache`, `no-cache`);
@@ -51,7 +51,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (accessToken) {
-      const isValidToken = await validateToken(accessToken, refreshToken);
+      const isValidToken = await validateToken(accessToken);
 
       if (isValidToken) {
         const response = NextResponse.next();
@@ -75,14 +75,14 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-async function validateToken(accessToken?: string, refreshToken?: string): Promise<boolean> {
+async function validateToken(accessToken?: string): Promise<boolean> {
   if (!accessToken) return false;
 
   try {
     const validateResponse = await fetch(API_ROUTES.AUTH.VALIDATE, {
       credentials: 'include',
       headers: {
-        Cookie: `access_token=${accessToken}${refreshToken ? `; refresh_token=${refreshToken}` : ''}`
+        'Authorization': `Bearer ${accessToken}`,
       }
     });
 
