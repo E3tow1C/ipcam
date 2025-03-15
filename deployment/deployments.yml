@@ -214,11 +214,18 @@ spec:
   selector:
     matchLabels:
       app: frontend
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
         app: frontend
     spec:
+      restartPolicy: Always
       terminationGracePeriodSeconds: 30
       containers:
       - name: frontend
