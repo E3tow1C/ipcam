@@ -235,4 +235,4 @@ spec:
           - configMapRef:
               name: frontend-config
         ports:
-        - containerPort: 5001
+        - containerPort: 3000
