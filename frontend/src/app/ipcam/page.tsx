@@ -6,7 +6,7 @@ import { CameraData, getAllCameras } from "@/services/apis";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera, faLock, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 
 export default function Home() {
