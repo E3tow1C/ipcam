@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
+import Modal from "@/components/Modal";
 import { captureCameraImage, deleteCamera, updateCamera } from "@/services/apis";
 import { faCircleNotch, faCameraAlt, faPen, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,6 +20,7 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
     const [isCapturing, setIsCapturing] = useState(false);
     const [images, setImages] = useState<string[]>([]);
     const [isConfiguring, setIsConfiguring] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [message, setMessage] = useState<string>('');
     const [isAuth, setIsAuth] = useState<boolean>((camera.username && camera.password) ? true : false);
@@ -90,6 +92,34 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
 
     return (
         <>
+            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+                {(close) => (
+                    <div className="text-center">
+                        <h2 className="text-lg font-bold text-gray-600">Delete This Camera?</h2>
+                        <p className="mt-1 mb-6 text-gray-500">Are you sure you want to delete this camera?</p>
+   
+                        <div className="mt-4 flex justify-center gap-4">
+                            <button
+                                className="bg-red-400 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-all"
+                                onClick={() => {
+                                        handleDeleteCamera();
+                                        close();
+                                    }
+                                }
+                            >
+                                Delete
+                            </button>
+                            <button
+                                className="bg-gray-200 text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-300 transition-all"
+                                onClick={close}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </Modal>
+
             <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between p-3">
                     <h2 className="text-lg font-bold ml-2 mb-2 lg:mb-0">{camera.name}</h2>
@@ -140,7 +170,7 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                 )
                             }
                         </button>
-                        <button className="bg-red-400 text-white px-3 py-2 rounded-md disabled:opacity-70" onClick={handleDeleteCamera}>
+                        <button className="bg-red-400 text-white px-3 py-2 rounded-md disabled:opacity-70" onClick={() => setIsOpen(true)}>
                             <FontAwesomeIcon icon={faXmark} className="mr-2" />
                             Delete
                         </button>
