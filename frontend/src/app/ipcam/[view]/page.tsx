@@ -123,7 +123,15 @@ export default function Page() {
                   className="w-full h-full object-cover rounded-xl"
                 />
               ) : (
-                <p>Loading image...</p>
+                <>
+                  {
+                    camera.authType ? (
+                      <h4 className="block">Trying to authenticate camera access with {camera.authType} method...</h4>
+                    ) : (
+                      <p>Loading Camera...</p>
+                    )
+                  }
+                </>
               )}
             </div>
             <CaptureSection camera={camera} cameraId={view} />
