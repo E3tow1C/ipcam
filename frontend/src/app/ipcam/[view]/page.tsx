@@ -68,6 +68,7 @@ export default function Page() {
       } catch (error) {
         toast.dismiss();
         toast.error("Camera cannot be authenticated");
+        console.error(error);
       }
     }
 
