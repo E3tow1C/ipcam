@@ -8,34 +8,36 @@ export async function GET(req: NextRequest) {
   const password = searchParams.get('password');
   const authType = searchParams.get('authType');
 
-  if (!url) {
-    return NextResponse.json({ error: 'Camera URL is required' }, { status: 400 });
+  if (!url || !username || !password) {
+    return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
   }
 
   try {
-    const response = await axios({
-      method: 'GET',
-      url: url,
-      responseType: 'arraybuffer',
-      auth: username && password ? {
-        username,
-        password,
-        ...(authType === 'digest' ? { type: 'digest' } : {})
-      } : undefined
-    });
+    let response;
+    
+    if (authType === 'digest') {
+      response = await axios.get(url, {
+        auth: { username, password },
+        responseType: 'stream',
+      });
+    } else {
+      const basicAuth = Buffer.from(`${username}:${password}`).toString('base64');
+      response = await axios.get(url, {
+        headers: {
+          Authorization: `Basic ${basicAuth}`,
+        },
+        responseType: 'stream',
+      });
+    }
 
     return new Response(response.data, {
       headers: {
-        'Content-Type': response.headers['content-type'] || 'application/octet-stream',
-        'Access-Control-Allow-Origin': '*'
-      }
+        'Content-Type': response.headers['content-type'] || 'multipart/x-mixed-replace',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   } catch (error) {
-    const err = error as any;
-    return NextResponse.json({ 
-      error: err.message 
-    }, { 
-      status: err.response?.status || 500 
-    });
+    console.error(error);
+    return NextResponse.json({ error: 'Failed to fetch camera stream' }, { status: 401 });
   }
 }

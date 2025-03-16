@@ -43,6 +43,8 @@ export default function Page() {
 
         const proxyUrl = new URL('/api/stream', window.location.origin);
         proxyUrl.searchParams.set('url', camera.url);
+        console.log("Fetching camera stream from:", proxyUrl.toString());
+
         
         if (camera.username && camera.password) {
           proxyUrl.searchParams.set('username', camera.username);
@@ -57,16 +59,15 @@ export default function Page() {
 
         if (!response.ok) {
           toast.dismiss();
-          toast.error(`Camera feed not available (${response.status})`);
+          toast.error(`Camera cannot be authenticated`);
+          setImageSrc(camera.url);
           return;
         }
 
-        const blob = await response.blob();
-        const dataUrl = URL.createObjectURL(blob);
-        setImageSrc(dataUrl);
+        setImageSrc(proxyUrl.toString());
       } catch (error) {
         toast.dismiss();
-        toast.error("Camera feed not available");
+        toast.error("Camera cannot be authenticated");
       }
     }
 
