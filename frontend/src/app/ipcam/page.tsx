@@ -52,7 +52,7 @@ export default function Home() {
                           <img
                             src={
                               camera.url.includes('@')
-                                ? camera.url.replace(/(https?:\/\/)(.*@)/, '$1')
+                                ? process.env.NEXT_PUBLIC_API_URL + '/stream?url=' + encodeURIComponent(camera.url)
                                 : camera.url
                             }
                             alt="ipcam"

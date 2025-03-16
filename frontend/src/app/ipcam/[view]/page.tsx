@@ -54,7 +54,8 @@ export default function Page() {
           let url = camera.url;
 
           if (camera.url.includes('@')) {
-            url = camera.url.replace(/(https?:\/\/)(.*@)/, '$1');
+            const encodedUrl = encodeURIComponent(camera.url);
+            url = process.env.NEXT_PUBLIC_API_URL + '/stream?url=' + encodedUrl;
             console.log("Fetching camera stream from:", url);
           }
 
