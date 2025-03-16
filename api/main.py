@@ -67,6 +67,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/openapi.json",
             "/auth/refresh",
             "/auth/validate",
+            "/stream",
         ] and not request.url.path.startswith("/storage/images"):
             token = request.headers.get("Authorization")
             is_api_key = False
@@ -945,6 +946,42 @@ def dashboard():
         "total_images_captured": total_images_captured,
         "today_images": today_images,
     }
+
+
+@app.get("/stream")
+def stream(url: str):
+    """
+    Stream IP camera feed back to client.
+    
+    Args:
+        url: URL of the IP camera stream
+    
+    Returns:
+        StreamingResponse: MJPEG stream from the camera
+    """
+    def generate_frames():
+        cap = cv2.VideoCapture(url)
+        if not cap.isOpened():
+            raise HTTPException(status_code=500, detail="Could not connect to camera stream")
+        
+        try:
+            while True:
+                success, frame = cap.read()
+                if not success:
+                    break
+                
+                # Encode frame as JPEG
+                _, buffer = cv2.imencode('.jpg', frame)
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + 
+                       buffer.tobytes() + b'\r\n')
+        finally:
+            cap.release()
+    
+    return StreamingResponse(
+        generate_frames(), 
+        media_type="multipart/x-mixed-replace; boundary=frame"
+    )
 
 
 def capture_and_save_image_from_camera(camera_id: str, cam_rtsp_url: str):
