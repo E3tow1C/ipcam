@@ -50,7 +50,11 @@ export default function Home() {
                           </div>
                         ) : (
                           <img
-                            src={camera.url}
+                            src={
+                              camera.url.includes('@')
+                                ? camera.url.replace(/(https?:\/\/)(.*@)/, '$1')
+                                : camera.url
+                            }
                             alt="ipcam"
                             className="w-full h-56 object-cover rounded-lg"
                           />

@@ -51,7 +51,14 @@ export default function Page() {
           proxyUrl.searchParams.set('password', camera.password);
           proxyUrl.searchParams.set('authType', camera.authType || 'basic');
         } else {
-          setImageSrc(camera.url);
+          let url = camera.url;
+
+          if (camera.url.includes('@')) {
+            url = camera.url.replace(/(https?:\/\/)(.*@)/, '$1');
+            console.log("Fetching camera stream from:", url);
+          }
+
+          setImageSrc(url);
           return;
         }
 
