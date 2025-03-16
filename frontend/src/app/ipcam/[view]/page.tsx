@@ -37,44 +37,35 @@ export default function Page() {
   }, [router, view]);
 
   useEffect(() => {
-
     async function fetchImage() {
       try {
         if (!camera) return;
 
-        console.log(camera);
+        const proxyUrl = new URL('/api/stream', window.location.origin);
+        proxyUrl.searchParams.set('url', camera.url);
         
-        const headers: HeadersInit = new Headers();
         if (camera.username && camera.password) {
-          const credentials = `${camera.username}:${camera.password}`;
-          if (camera.authType === "basic") {
-            headers.set("Authorization", `Basic ${btoa(credentials)}`);
-          }
+          proxyUrl.searchParams.set('username', camera.username);
+          proxyUrl.searchParams.set('password', camera.password);
+          proxyUrl.searchParams.set('authType', camera.authType || 'basic');
         } else {
           setImageSrc(camera.url);
           return;
         }
 
-        const response = await fetch(camera.url, {
-          method: "GET",
-          headers: headers,
-          credentials: "include",
-        });
+        const response = await fetch(proxyUrl);
 
         if (!response.ok) {
-          if (toast) {
-            toast.dismiss();
-          }
-          toast.error("Camera feed not available");
+          toast.dismiss();
+          toast.error(`Camera feed not available (${response.status})`);
+          return;
         }
 
         const blob = await response.blob();
         const dataUrl = URL.createObjectURL(blob);
         setImageSrc(dataUrl);
-      } catch {
-        if (toast) {
-          toast.dismiss();
-        }
+      } catch (error) {
+        toast.dismiss();
         toast.error("Camera feed not available");
       }
     }
