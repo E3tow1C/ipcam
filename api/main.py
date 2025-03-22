@@ -675,7 +675,7 @@ def filter_images(source: str, from_date: str = None, to_date: str = None):
 
             if from_date:
                 try:
-                    from_datetime = datetime.fromisoformat(from_date)
+                    from_datetime = datetime.fromisoformat(from_date) - timedelta(hours=7)
                     query["timestamp"]["$gte"] = from_datetime
                 except ValueError:
                     return {
@@ -685,7 +685,7 @@ def filter_images(source: str, from_date: str = None, to_date: str = None):
 
             if to_date:
                 try:
-                    to_datetime = datetime.fromisoformat(to_date)
+                    to_datetime = datetime.fromisoformat(to_date) - timedelta(hours=7)
                     query["timestamp"]["$lte"] = to_datetime
                 except ValueError:
                     return {
@@ -699,7 +699,7 @@ def filter_images(source: str, from_date: str = None, to_date: str = None):
         for record in records:
             record_dict = {
                 "id": str(record["_id"]),
-                "timestamp": record["timestamp"].isoformat(),
+                "timestamp": (record["timestamp"] + timedelta(hours=7)).isoformat(),
                 "type": record["type"],
                 "image_url": record["image_url"],
                 "object_name": record["object_name"],
