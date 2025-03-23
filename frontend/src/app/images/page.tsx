@@ -163,12 +163,6 @@ export default function Home() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                   {images.reverse().map((img, index) => (
                     <div key={index} className="overflow-hidden rounded-lg bg-white border p-2">
-                      {/* <img
-                        src={img.image_url}
-                        alt={`Image ${index + 1}`}
-                        className="w-full h-64 rounded-md object-cover cursor-pointer"
-                        onClick={() => window.open(img.image_url, '_blank')}
-                      /> */}
                       <Image
                         src={img.image_url}
                         alt={`Image ${index + 1}`}
