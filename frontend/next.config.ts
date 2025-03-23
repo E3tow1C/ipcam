@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: '218.219.195.24',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/**',
+      }
     ],
   },
 };

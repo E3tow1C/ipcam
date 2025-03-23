@@ -1,3 +1,4 @@
+// /* eslint-disable @next/next/no-img-element */
 "use client";
 
 import Modal from "@/components/Modal";
@@ -5,7 +6,8 @@ import Sidebar from "@/components/SideBar";
 import { CameraData, deleteImage, getAllCameras, getFilteredImages } from "@/services/apis";
 import { faCamera, faChevronDown, faCopy, faImage, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 export type ImageDataProb = {
@@ -48,14 +50,14 @@ export default function Home() {
     fetchCameras();
   }, []);
 
-  const handleFilterImages = async () => {
+  const handleFilterImages = useCallback(async () => {
     const filteredImages = await getFilteredImages(selectedSource, fromDate, toDate);
     setImages(filteredImages);
-  };
+  }, [fromDate, selectedSource, toDate]);
 
   useEffect(() => {
     handleFilterImages();
-  }, [fromDate, toDate, selectedSource]);
+  }, [fromDate, toDate, selectedSource, handleFilterImages]);
 
   const handleDeleteImage = async (id: string) => {
     const res = await deleteImage(id);
@@ -161,9 +163,18 @@ export default function Home() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                   {images.reverse().map((img, index) => (
                     <div key={index} className="overflow-hidden rounded-lg bg-white border p-2">
-                      <img
+                      {/* <img
                         src={img.image_url}
                         alt={`Image ${index + 1}`}
+                        className="w-full h-64 rounded-md object-cover cursor-pointer"
+                        onClick={() => window.open(img.image_url, '_blank')}
+                      /> */}
+                      <Image
+                        src={img.image_url}
+                        alt={`Image ${index + 1}`}
+                        width={100}
+                        height={100}
+                        priority
                         className="w-full h-64 rounded-md object-cover cursor-pointer"
                         onClick={() => window.open(img.image_url, '_blank')}
                       />
