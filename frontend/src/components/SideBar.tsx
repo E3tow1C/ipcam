@@ -1,9 +1,10 @@
 'use client'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faChartPie, faImage, faKey, faUpload, faUserAlt, faVideoCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faImage, faKey, faUpload, faUserAlt, faVideoCamera } from "@fortawesome/free-solid-svg-icons";
 import MenuItem from "./MenuItem";
 import { useEffect, useState } from "react";
 import UserCard from "./UserCard";
+import SidebarHeader from "./SidebarHeader";
 import jwt from "jsonwebtoken";
 import Cookies from "js-cookie";
 
@@ -27,24 +28,10 @@ const Sidebar: React.FC = () => {
         ${isSidebarVisible ? "max-w-[400px] w-full flex flex-col justify-between" : "w-0 hidden"} 
         md:hidden`}
       >
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faChartPie} className="w-11 h-11 text-blue-600" />
-          <div className="flex flex-col gap-1">
-            <h1 className="text-xl font-bold leading-none text-blue-600 flex items-center">
-              IPCam Manager
-            </h1>
-            <p className="text-sm text-gray-500 leading-none">
-              Access control system
-            </p>
-          </div>
-          <button
-            onClick={() => setIsSidebarVisible(prev => !prev)}
-            className="ml-auto"
-          >
-            <FontAwesomeIcon icon={faXmark} className="text-2xl text-gray-500" />
-          </button>
-
-        </div>
+        <SidebarHeader 
+          showCloseButton={true} 
+          onClose={() => setIsSidebarVisible(prev => !prev)} 
+        />
         <div className="mt-9 flex flex-col gap-1">
           <MenuItems />
         </div>
@@ -59,17 +46,7 @@ const Sidebar: React.FC = () => {
       </button>
 
       <aside className="hidden md:flex w-[300px] bg-gray-100 p-6 h-full flex-col justify-between">
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faChartPie} className="w-11 h-11 text-blue-600" />
-          <div className="flex flex-col gap-1">
-            <h1 className="text-xl font-bold leading-none text-blue-600 flex items-center">
-              IPCam Manager
-            </h1>
-            <p className="text-sm text-gray-500 leading-none">
-              Access control system
-            </p>
-          </div>
-        </div>
+        <SidebarHeader />
         <div className="mt-9 flex flex-col gap-1">
           <MenuItems />
         </div>

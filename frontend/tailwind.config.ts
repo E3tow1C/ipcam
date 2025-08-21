@@ -26,16 +26,16 @@ export default {
           '100%': { transform: 'translateX(0)' },
         },
         'slide-up': {
-          '0%': { transform: 'translateY(20)', opacity: "0", scale: "0.9" },
+          '0%': { transform: 'translateY(20px)', opacity: "0", scale: "0.9" },
           '100%': { transform: 'translateY(0)', opacity: "1", scale: "1" },
         },
         'fade-up': {
-          '0%': { opacity: "0", transform: 'translateY(20)', scale: "0.9" },
+          '0%': { opacity: "0", transform: 'translateY(20px)', scale: "0.9" },
           '100%': { opacity: "1", transform: 'translateY(0)', scale: "1" },
         },
         'fade-down': {
           '0%': { opacity: "1", transform: 'translateY(0)', scale: "1" },
-          '100%': { opacity: "0", transform: 'translateY(20)', scale: "0.9" },
+          '100%': { opacity: "0", transform: 'translateY(20px)', scale: "0.9" },
         },
         'fade-in': {
           '0%': { opacity: "0" },
