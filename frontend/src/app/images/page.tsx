@@ -1,35 +1,40 @@
 // /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import Modal from "@/components/Modal";
+import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
+import DateFilter from "@/components/DateFilter";
 import Sidebar from "@/components/SideBar";
-import { CameraData, deleteImage, getAllCameras, getFilteredImages } from "@/services/apis";
+import { CameraData, getAllCameras } from "@/services/camera-api";
+import { ImageDataProb, deleteImage, getFilteredImages } from "@/services/image-api";
 import { faCamera, faChevronDown, faCopy, faImage, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import toast, { Toaster } from "react-hot-toast";
-
-export type ImageDataProb = {
-  id: string;
-  timestamp: string;
-  type: string;
-  image_url: string;
-  camera_id: string;
-};
+import { formatDate, getTomorrowISO } from "@/utils/api-helpers";
+import { DATE_FORMAT_OPTIONS } from "@/constants/ui-constants";
 
 
 export default function Home() {
   const [images, setImages] = useState<ImageDataProb[]>([]);
   const [cameras, setCameras] = useState<CameraData[]>([]);
-  const [tomorrow, setTomorrow] = useState<string>("");
   const [selectedSource, setSelectedSource] = useState<string>("all");
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const [thisImage, setThisImage] = useState<ImageDataProb | null>(null);
 
-  const typeName = (type: string) => {
+  const tomorrow = useMemo(() => getTomorrowISO(), []);
+
+  // Memoize camera lookup for performance
+  const camerasById = useMemo(() => {
+    return cameras.reduce((acc, camera) => {
+      acc[camera._id.toString()] = camera;
+      return acc;
+    }, {} as Record<string, CameraData>);
+  }, [cameras]);
+
+  const typeName = useCallback((type: string) => {
     switch (type) {
       case "upload":
         return "Uploaded Image";
@@ -38,11 +43,9 @@ export default function Home() {
       default:
         return "Unknown";
     }
-  }
+  }, []);
 
   useEffect(() => {
-    setTomorrow(new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16));
-
     async function fetchCameras() {
       const cameras: CameraData[] = await getAllCameras();
       setCameras(cameras);
@@ -67,44 +70,33 @@ export default function Home() {
     }
   }
 
+  const getCameraName = useCallback((cameraId: string) => {
+    return camerasById[cameraId]?.name || "Unknown Camera";
+  }, [camerasById]);
+
+  const getImageDeleteInfo = useCallback(() => {
+    if (!thisImage || thisImage.type !== "capture") return null;
+    
+    return (
+      <p className="text-gray-500">
+        This image was captured by
+        <FontAwesomeIcon icon={faCamera} className="text-gray-500 text-sm mx-2" />
+        <span className="font-bold mr-2">{getCameraName(thisImage.camera_id)}</span>
+        that was captured on {formatDate(thisImage.timestamp, DATE_FORMAT_OPTIONS)}
+      </p>
+    );
+  }, [thisImage, getCameraName]);
+
   return (
     <>
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        {(close) => (
-          <div className="text-center">
-            <h2 className="text-lg font-bold text-gray-600">Delete Image</h2>
-            <p className="mt-1 text-gray-500">Are you sure you want to delete this image?</p>
-            {
-              thisImage?.type === "capture" && (
-                <p className="text-gray-500">
-                  This image was captured by
-                  <FontAwesomeIcon icon={faCamera} className="text-gray-500 text-sm mx-2" />
-                  <span className="font-bold mr-2">{(cameras.find((camera) => camera._id.toString() === thisImage.camera_id)?.name) || "Unknown Camera"}</span>
-                  that was captured on {new Date(thisImage.timestamp).toLocaleString()}
-                </p>
-              )
-            }
-
-            <div className="mt-9 flex justify-center gap-4">
-              <button
-                className="bg-red-400 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-all"
-                onClick={() => {
-                  handleDeleteImage(thisImage?.id || '');
-                  close();
-                }}
-              >
-                Delete
-              </button>
-              <button
-                className="bg-gray-200 text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-300 transition-all"
-                onClick={close}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-      </Modal>
+      <DeleteConfirmationModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={() => handleDeleteImage(thisImage?.id || '')}
+        title="Delete Image"
+        message="Are you sure you want to delete this image?"
+        additionalInfo={getImageDeleteInfo()}
+      />
       <div className="h-screen flex flex-col">
         <Toaster />
         <div className="flex flex-1">
@@ -136,25 +128,21 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="w-full">
-                    <div className="flex items-center justify-between">
-                      <p className="text-gray-500 mb-1">From Date</p>
-                      <button className="text-blue-500 hover:underline" onClick={() => setFromDate("")}>
-                        Clear
-                      </button>
-                    </div>
-                    <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={tomorrow} onChange={(e) => setFromDate(e.target.value)} value={fromDate} />
-                  </div>
+                  <DateFilter
+                    label="From Date"
+                    value={fromDate}
+                    onChange={setFromDate}
+                    max={tomorrow}
+                    onClear={() => setFromDate("")}
+                  />
 
-                  <div className="w-full">
-                    <div className="flex items-center justify-between">
-                      <p className="text-gray-500 mb-1">To Date</p>
-                      <button className="text-blue-500 hover:underline" onClick={() => setToDate("")}>
-                        Clear
-                      </button>
-                    </div>
-                    <input type="datetime-local" className="border w-full appearance-none border-gray-300 rounded-md px-2 py-2 cursor-pointer hover:bg-gray-50 transition-all focus:outline-none" max={tomorrow} onChange={(e) => setToDate(e.target.value)} value={toDate} />
-                  </div>
+                  <DateFilter
+                    label="To Date"
+                    value={toDate}
+                    onChange={setToDate}
+                    max={tomorrow}
+                    onClear={() => setToDate("")}
+                  />
 
                 </div>
                 <h2 className="text-gray-500 font-semibold mb-2 mt-4">Total Images: {images && images.length}</h2>
@@ -174,14 +162,14 @@ export default function Home() {
                       />
                       <div className="flex items-center justify-between mt-2">
                         <p className="text-gray-500 text-sm font-semibold">{typeName(img.type)}</p>
-                        <p className="text-gray-500 text-sm">{new Date(img.timestamp).toLocaleString()}</p>
+                        <p className="text-gray-500 text-sm">{formatDate(img.timestamp, DATE_FORMAT_OPTIONS)}</p>
                       </div>
                       {
                         img.type === "capture" && (
                           <div className="flex items-center mt-1 justify-between">
                             <p className="text-gray-500 text-sm line-clamp-1">
                               <FontAwesomeIcon icon={faCamera} className="text-gray-500 text-sm mr-2" />
-                              {(cameras.find((camera) => camera._id.toString() === img.camera_id)?.name) || "Unknown Camera"}
+                              {getCameraName(img.camera_id)}
                             </p>
                           </div>
                         )

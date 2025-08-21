@@ -1,7 +1,7 @@
 import { MetricData } from '@/app/page';
 import { API_ROUTES } from '../constants/api-routes';
 import Cookies from 'js-cookie';
-import { ImageDataProb } from '@/app/images/page';
+import { ImageDataProb } from './image-api';
 
 type RequestBody = Record<string, unknown> | FormData | null;
 

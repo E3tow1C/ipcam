@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import Modal from "@/components/Modal";
-import { captureCameraImage, deleteCamera, updateCamera } from "@/services/apis";
+import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
+import FormInput from "@/components/FormInput";
+import { captureCameraImage, deleteCamera, updateCamera } from "@/services/camera-api";
 import { faCircleNotch, faCameraAlt, faPen, faCheck, faXmark, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -21,7 +22,6 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
     const [images, setImages] = useState<string[]>([]);
     const [isConfiguring, setIsConfiguring] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [message, setMessage] = useState<string>('');
     const [isAuth, setIsAuth] = useState<boolean>((camera.username && camera.password) ? true : false);
     const [formData, setFormData] = useState({
@@ -92,33 +92,13 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-                {(close) => (
-                    <div className="text-center">
-                        <h2 className="text-lg font-bold text-gray-600">Delete This Camera?</h2>
-                        <p className="mt-1 mb-6 text-gray-500">Are you sure you want to delete this camera?</p>
-   
-                        <div className="mt-4 flex justify-center gap-4">
-                            <button
-                                className="bg-red-400 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-all"
-                                onClick={() => {
-                                        handleDeleteCamera();
-                                        close();
-                                    }
-                                }
-                            >
-                                Delete
-                            </button>
-                            <button
-                                className="bg-gray-200 text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-300 transition-all"
-                                onClick={close}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </Modal>
+            <DeleteConfirmationModal
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                onConfirm={handleDeleteCamera}
+                title="Delete This Camera?"
+                message="Are you sure you want to delete this camera?"
+            />
 
             <div className="w-[90%] max-w-[800px] mx-auto my-3 bg-white z-10 border rounded-xl">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between p-3">
@@ -183,35 +163,29 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                 handleUpdateCamera();
                             }}
                         >
-                            <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="name">Camera Name</label>
-                            <input
-                                className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            <FormInput
                                 id="name"
-                                type="text"
+                                label="Camera Name"
                                 placeholder="Name for new camera"
                                 value={formData.name}
                                 onChange={handleInputChange}
                             />
 
-
-                            <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Location</label>
-                            <input
-                                className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            <FormInput
                                 id="location"
-                                type="text"
+                                label="Location"
                                 placeholder="Location of camera"
                                 value={formData.location}
                                 onChange={handleInputChange}
                             />
+
                             <p className="text-gray-600 font-semibold mt-6">
                                 Camera Configuration
                             </p>
 
-                            <label className="block text-gray-500 text-sm mb-1 mt-2 ml-1" htmlFor="url">Camera URL</label>
-                            <input
-                                className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            <FormInput
                                 id="url"
-                                type="text"
+                                label="Camera URL"
                                 placeholder="Camera URL or IP"
                                 value={formData.url}
                                 onChange={handleInputChange}
@@ -233,24 +207,20 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                 <label htmlFor="auth" className="text-gray-500 select-none"> Camera Authentication</label>
                             </div>
 
-                            {
-                                isAuth &&
+                            {isAuth && (
                                 <>
-                                    <label className="block text-gray-500 text-sm mb-1 ml-1" htmlFor="location">Username</label>
-                                    <input
-                                        className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    <FormInput
                                         id="username"
-                                        type="text"
+                                        label="Username"
                                         placeholder="Camera Username"
                                         value={formData.username}
                                         onChange={handleInputChange}
                                         disabled={!isAuth}
                                     />
 
-                                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Password</label>
-                                    <input
-                                        className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    <FormInput
                                         id="password"
+                                        label="Password"
                                         type="password"
                                         placeholder="Camera Password"
                                         value={formData.password}
@@ -258,7 +228,7 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                         disabled={!isAuth}
                                     />
 
-                                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="location">Auth Type</label>
+                                    <label className="block text-gray-500 text-sm mb-1 mt-4 ml-1" htmlFor="authType">Auth Type</label>
                                     <select
                                         className="bg-gray-50 border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-6"
                                         id="authType"
@@ -270,7 +240,7 @@ export default function CaptureSection({ camera, cameraId }: { camera: Camera; c
                                         <option value="digest">Digest</option>
                                     </select>
                                 </>
-                            }
+                            )}
 
                             <p className="text-red-500 text-sm mb-2">{message}</p>
                             <button className="bg-blue-500 text-white w-full px-3 py-2 rounded-md hover:bg-blue-600 transition-all disabled:opacity-70">
