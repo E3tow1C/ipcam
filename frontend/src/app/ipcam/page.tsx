@@ -2,7 +2,7 @@
 "use client";
 
 import Sidebar from "@/components/SideBar";
-import { CameraData, getAllCameras } from "@/services/apis";
+import { CameraData, getAllCameras } from "@/services/camera-api";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -1,6 +1,6 @@
 'use client'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faImage, faKey, faUpload, faUserAlt, faVideoCamera } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faChartPie, faImage, faKey, faUpload, faUserAlt, faVideoCamera } from "@fortawesome/free-solid-svg-icons";
 import MenuItem from "./MenuItem";
 import { useEffect, useState } from "react";
 import UserCard from "./UserCard";

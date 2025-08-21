@@ -5,5 +5,6 @@ export * from './credential-api';
 export * from './dashboard-api';
 export * from './image-api';
 
-// Keep the original apis.ts for now, but mark as deprecated
-export * from './apis';
+// Note: The original apis.ts is kept for backward compatibility
+// but some functions may have conflicts with the new modular structure
+// Import directly from specific modules for new code
